@@ -2,16 +2,13 @@
 {{ template "header.tpl" .}}
 
 
-
-
-    <header>
-      <h1 class="logo">Сайт в разработке</h1>
-      <div class="description">
-
-      </div>
-    </header>
+    <div class="columns">
+        <div class="column is-one-fifth">Статистика</div>
+        <div class="column">Основной контент</div>
+    </div>
 
     <script src="/static/js/reload.min.js"></script>
 
-    <!-- Шаблон футера -->
-    {{ template "footer.tpl" .}}
+
+<!-- Шаблон футера -->
+{{ template "footer.tpl" .}}

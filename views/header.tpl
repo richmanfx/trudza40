@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
 
     <!-- jQuery -->
-{{/*<script src="/js/jquery.min.js"></script>*/}}
+    <script src="/static/js/jquery.min.js"></script>
 
     <!-- Бутстрап -->
 {{/*<link rel="stylesheet" href="/css/bootstrap.min.css">*/}}
@@ -31,5 +31,20 @@
 
 <body>
 <div id="content">
+
+    <div class="columns">
+        <div class="column is-one-fifth">
+            <div class="navbar-brand" style="padding: 20px;">
+                {{/*<div style="width:180px; alignment: left; margin:auto; padding: 10px;">*/}}
+                    <a class="" href="//trudza40.ru">
+                        <img src="/static/img/40+_trud.svg.png" width="160" height="160">
+                    </a>
+                    {{/*<p style="line-height:50px;">Место для меню</p>*/}}
+                {{/*</div>*/}}
+            </div>
+
+        </div>
+        <div class="column">Заголовок. Основная форма поиска.</div>
+    </div>
 
     <!-- Шаблон меню -->

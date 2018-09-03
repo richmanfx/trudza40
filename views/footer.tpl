@@ -16,5 +16,6 @@
             $("footer").addClass("navbar-fixed-bottom");
     </script>
 
+</div>  <!-- id="content"  -->
 </body>
 </html>
