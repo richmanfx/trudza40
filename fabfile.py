@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 import os
+import datetime
 
 from fabric.api import task
 from fabric.state import env
@@ -11,9 +12,10 @@ from fabconf import REMOTE_HOST, REMOTE_PORT, REMOTE_USER
 env.hosts = REMOTE_HOST
 env.port = REMOTE_PORT
 env.user = REMOTE_USER
-env.shell = "bash"
 home_dir = os.getenv('HOME')
 project_name = "trudza40"
+now = datetime.datetime.now()
+current_date = str(now.strftime("%Y%m%d"))  # Текущая дата
 archive_file_name = project_name + ".tar.gz"
 project_dir = home_dir + os.path.sep + "go" + os.path.sep + "src" + os.path.sep + project_name
 
@@ -23,6 +25,7 @@ def start():
     """ Запускать всё по очереди """
     make_archive()
     send_to_remote_server()
+    make_backup()
 
 
 @task()
@@ -49,7 +52,19 @@ def send_to_remote_server():
     )
 
 
-# 3.Забекапить старый проект
+@task()
+def make_backup():
+    """ Забекапить старый проект на дальнем сервере """
+    print("\n ==> Мake a backup of the old project on remote server ...")
+
+    remote_backup_dir = home_dir + os.path.sep + "backups" + os.path.sep + project_name + ".ru"
+    remote_project_dir = "/usr/local/www/html" + os.path.sep + project_name + "_ru"
+
+    run("/bin/mkdir " + remote_backup_dir + os.path.sep + current_date)
+
+    run("/usr/bin/tar cvfz - " + remote_project_dir + " > " +
+        remote_backup_dir + os.path.sep + current_date + os.path.sep + archive_file_name)
+    print("Backup complete")
 
 
 # 4. Остановить сервер
