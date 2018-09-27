@@ -27,6 +27,7 @@ def start():
     send_to_remote_server()
     make_backup()
     app_stop()
+    app_start()
 
 
 @task()
@@ -61,7 +62,7 @@ def make_backup():
     remote_backup_dir = home_dir + os.path.sep + "backups" + os.path.sep + project_name + ".ru"
     remote_project_dir = "/usr/local/www/html" + os.path.sep + project_name + "_ru"
 
-    run("/bin/mkdir " + remote_backup_dir + os.path.sep + current_date)
+    run("/bin/mkdir -p -- " + remote_backup_dir + os.path.sep + current_date)
 
     run("/usr/bin/tar cvfz - " + remote_project_dir + " > " +
         remote_backup_dir + os.path.sep + current_date + os.path.sep + archive_file_name)
@@ -70,8 +71,8 @@ def make_backup():
 
 @task()
 def app_stop():
-    """ Stop application on remote server """
-    print("\n ==> Stop application on remote server ...")
+    """ Stopping application on remote server """
+    print("\n ==> Stopping application on remote server ...")
     run("/usr/local/sbin/stop_trudza40")
     print("Stopping application complete")
 
@@ -82,8 +83,12 @@ def app_stop():
 # 6.Развернуть новый проект
 
 
-# 7.Запустить сервер
-
+@task()
+def app_start():
+    """ Starting application on remote server """
+    print("\n ==> Starting application on remote server ...")
+    run("/usr/local/sbin/start_trudza40")
+    print("Starting application complete")
 
 # 8.Проверить, что сервер жив и отвечает
 
