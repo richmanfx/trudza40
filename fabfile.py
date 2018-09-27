@@ -15,22 +15,23 @@ env.user = REMOTE_USER
 home_dir = os.getenv('HOME')
 project_name = "trudza40"
 now = datetime.datetime.now()
-current_date = str(now.strftime("%Y%m%d"))  # Текущая дата
+current_date = str(now.strftime("%Y%m%d"))
 archive_file_name = project_name + ".tar.gz"
 project_dir = home_dir + os.path.sep + "go" + os.path.sep + "src" + os.path.sep + project_name
 
 
 @task(default=True)
 def start():
-    """ Запускать всё по очереди """
+    """ Run all in order """
     make_archive()
     send_to_remote_server()
     make_backup()
+    app_stop()
 
 
 @task()
 def make_archive():
-    """ Собрать архив проекта через 'bee pack' """
+    """ Make an archive of the project through 'bee pack' """
     print("\n ==> Make archive ...")
 
     local("cd " + project_dir + "; " +
@@ -42,7 +43,7 @@ def make_archive():
 
 @task()
 def send_to_remote_server():
-    """ Отправить архив на дальний сервер """
+    """ Send archive file on the remote server """
     print("\n ==> Send archive to remote server ...")
 
     remote_home_dir = home_dir
@@ -54,8 +55,8 @@ def send_to_remote_server():
 
 @task()
 def make_backup():
-    """ Забекапить старый проект на дальнем сервере """
-    print("\n ==> Мake a backup of the old project on remote server ...")
+    """ Back up application on remote server """
+    print("\n ==> Мake a backup application on remote server ...")
 
     remote_backup_dir = home_dir + os.path.sep + "backups" + os.path.sep + project_name + ".ru"
     remote_project_dir = "/usr/local/www/html" + os.path.sep + project_name + "_ru"
@@ -67,7 +68,12 @@ def make_backup():
     print("Backup complete")
 
 
-# 4. Остановить сервер
+@task()
+def app_stop():
+    """ Stop application on remote server """
+    print("\n ==> Stop application on remote server ...")
+    run("/usr/local/sbin/stop_trudza40")
+    print("Stopping application complete")
 
 
 # 5.Удалить старый проект
