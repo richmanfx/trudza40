@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 import os
+import time
 import datetime
 
 from fabric.api import task
@@ -12,6 +13,7 @@ from fabconf import REMOTE_HOST, REMOTE_PORT, REMOTE_USER
 env.hosts = REMOTE_HOST
 env.port = REMOTE_PORT
 env.user = REMOTE_USER
+app_port = 8081
 home_dir = os.getenv('HOME')
 project_name = "trudza40"
 now = datetime.datetime.now()
@@ -28,6 +30,7 @@ def start():
     make_backup()
     app_stop()
     app_start()
+    check_app_running()
 
 
 @task()
@@ -73,7 +76,8 @@ def make_backup():
 def app_stop():
     """ Stopping application on remote server """
     print("\n ==> Stopping application on remote server ...")
-    run("/usr/local/sbin/stop_trudza40")
+    run("/usr/local/sbin/stop_" + project_name)
+    time.sleep(5)
     print("Stopping application complete")
 
 
@@ -87,10 +91,22 @@ def app_stop():
 def app_start():
     """ Starting application on remote server """
     print("\n ==> Starting application on remote server ...")
-    run("/usr/local/sbin/start_trudza40")
+    run("/usr/local/sbin/start_" + project_name + " &")
+    time.sleep(5)
     print("Starting application complete")
 
-# 8.Проверить, что сервер жив и отвечает
+
+@task()
+def check_app_running():
+    """ Check that application is running """
+    print("\n ==> Check that application is running ...")
+    output = run("netstat -naf inet")
+
+    if str(app_port) in output:
+        print("\nApplication started on remote server normally")
+    else:
+        print("\nError: Application not started on remote server!!!")
+
 
 
 # 9.Послать месседж админу
