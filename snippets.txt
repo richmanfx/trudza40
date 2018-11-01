@@ -78,3 +78,39 @@
     }
   </style>
 </head>
+
+########################################################################################################################
+
+   # @pytest.mark.skip
+    @patch.object(ShovGeoSentinel, 'process_task_contours')
+    @pytest.mark.django_db
+    def test_process_task_contours_method_with_contours(self, fake_process_task_contours):
+        """ Тест метода "process_task_contours" с контурами сменного задания у экскаватора """
+        self.log.debug("Work '%s'", self.get_method_name())
+
+        assert ShovGeoSentinel.process_task_contours is fake_process_task_contours
+        fake_process_task_contours.return_value = True, True
+
+        # Подготовить основные данные
+        self.data_preparation()
+
+        shov_geo_sentinel = ShovGeoSentinel()
+
+        result = shov_geo_sentinel.process_task_contours()
+        self.log.debug("Результат: {0}".format(result))
+
+
+########################################################################################################################
+   # @pytest.mark.skip
+    @patch.object(WorkRegimeDetail, 'get_borders')
+    @pytest.mark.django_db
+    def test_process_task_contours_method_with_contours(self, fake_get_borders):
+        """ Тест метода "process_task_contours" с контурами сменного задания у экскаватора """
+        self.log.debug("Work '%s'", self.get_method_name())
+
+        assert WorkRegimeDetail.get_borders is fake_get_borders
+        fake_get_borders.return_value = True, True
+
+        shov_geo_sentinel = ShovGeoSentinel()
+
+        shov_geo_sentinel.process_task_contours()

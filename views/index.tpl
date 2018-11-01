@@ -4,7 +4,13 @@
 
     <div class="columns">
         <div class="column is-one-fifth">Статистика</div>
-        <div class="column">Основной контент</div>
+        <div class="column">
+            Основной контент
+            <br>
+            <a href="//trudza40/realty">
+                Недвижимость
+            </a>
+        </div>
     </div>
 
     <script src="/static/js/reload.min.js"></script>
