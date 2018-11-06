@@ -7,7 +7,7 @@
         <div class="column">
             Основной контент
             <br>
-            <a href="//trudza40/realty">
+            <a href="/realty">
                 Недвижимость
             </a>
         </div>

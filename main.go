@@ -1,8 +1,8 @@
 package main
 
 import (
-	_ "trudza40/routers"
 	"github.com/astaxie/beego"
+	_ "trudza40/routers"
 )
 
 func main() {
