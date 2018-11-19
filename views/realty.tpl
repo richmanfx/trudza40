@@ -6,7 +6,13 @@
     <div class="column is-one-fifth">Недвижимость</div>
     <div class="column">
         Основная инфо про недвижимость
-        <p>{{.Website}} {{.Email}}</p>
+        <p>
+            {{.Website}} {{.Email}}
+        </p>
+
+        <a href="/login">
+            Залогиниться
+        </a>
 
     </div>
 </div>

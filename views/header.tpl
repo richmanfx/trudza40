@@ -7,8 +7,7 @@
     {{/*<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>*/}}
     <meta charset="UTF-8">
 
-    <!-- jQuery -->
-    <script src="/static/js/jquery.min.js"></script>
+
 
     <!-- Бутстрап -->
 {{/*<link rel="stylesheet" href="/css/bootstrap.min.css">*/}}
@@ -23,13 +22,16 @@
 
     <!-- Стили приложения -->
     <link rel="stylesheet" type="text/css" href="/static/css/trudza40.css">
-    <!-- Bulma -->
 
+    <!-- Bulma -->
     <link rel="stylesheet" type="text/css" href="/static/css/bulma.min.css">
+
+    <!-- jQuery -->
+    <script src="/static/js/jquery.min.js"></script>
 </head>
 
 <body>
-<div id="content">
+<div class="hero is-fullheight">
 
     <div class="columns">
         <div class="column is-one-fifth">

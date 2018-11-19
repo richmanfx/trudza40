@@ -13,7 +13,7 @@
         </div>
     </div>
 
-    <script src="/static/js/reload.min.js"></script>
+    {{/*<script src="/static/js/reload.min.js"></script>*/}}
 
 
 <!-- Шаблон футера -->

@@ -3,12 +3,12 @@
 body {
     /*font-size: 0.7vw;*/
     /*font-family: Verdana, serif;*/
-    background-color: #fff0f0;      /* Красноватый */
+    background-color: #9e8f8f;      /* Красноватый */
 }
 
-/*.footer {*/
-    /*background-color: #fff0f0;*/
-/*}*/
+footer {
+    background-color: #9e8f8f;
+}
 
 
 
