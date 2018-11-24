@@ -20,11 +20,11 @@
     tgKpHVL7lAQA1Fc3QEaK4kP4bjRb3cCWdXx80joOz/Jv5cLCxm8zuLkQVTP7nubDVk4JUYurweobzZEbaluVIfHLdG6jbAD33DrLJuCOA2M1Weix0t
     NQAAAAAElFTkSuQmCC" />
 
-    <!-- Стили приложения -->
-    <link rel="stylesheet" type="text/css" href="/static/css/trudza40.css">
-
     <!-- Bulma -->
     <link rel="stylesheet" type="text/css" href="/static/css/bulma.min.css">
+
+    <!-- Стили приложения -->
+    <link rel="stylesheet" type="text/css" href="/static/css/trudza40.css">
 
     <!-- jQuery -->
     <script src="/static/js/jquery.min.js"></script>
