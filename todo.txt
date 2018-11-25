@@ -1,4 +1,7 @@
 
+ - Модель с пользователем
+
+ - Пробовать накат Миграций: http://www.golangprograms.com/golang/beego-migration/
 
  - Авторизацию с солью
 
