@@ -1,19 +1,12 @@
 <!-- Шаблон хедера -->
-{{ template "header.tpl" .}}
+{{ template "realty_header.tpl" .}}
 
 
 <div class="columns">
-    <div class="column is-one-fifth">Недвижимость</div>
-    <div class="column">
-        Основная инфо про недвижимость
-        <p>
-            {{.Website}} {{.Email}}
-        </p>
-
-        <a href="/login">
-            Залогиниться
-        </a>
-
+    <div class="column ">
+        <div class="content has-text-centered">
+            Недвижимость
+        </div>
     </div>
 </div>
 

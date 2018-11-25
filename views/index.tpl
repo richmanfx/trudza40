@@ -7,7 +7,7 @@
         <div class="column">
             Основной контент
             <br>
-            <a href="/realty">
+            <a href="/login">
                 Недвижимость
             </a>
         </div>
