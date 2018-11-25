@@ -1,9 +1,12 @@
 
  - Модель с пользователем
 
- - Пробовать накат Миграций: http://www.golangprograms.com/golang/beego-migration/
+ - Пробовать накат Миграций:
+        http://www.golangprograms.com/golang/beego-migration/
+        https://godoc.org/github.com/lib/pq
 
  - Авторизацию с солью
+    -- Сессии в Beego: http://37yonub.ru/articles/beego-sessions-with-postgres-rus
 
  - Сделать сертификат SSL на сайт: https://certbot.eff.org
 
