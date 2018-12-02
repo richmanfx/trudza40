@@ -1,14 +1,18 @@
 package main
 
 import (
+	_ "github.com/astaxie/beego/migration"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 )
 
 type User struct {
-	Id   int
-	Name string `orm:"size(100)"`
+	Id       int
+	Login    string `orm:"size(255)"`
+	FullName string `orm:"size(255)"`
+	Password string `orm:"size(511)"`
+	Salt     string `orm:"size(511)"`
 }
 
 func init() {
