@@ -1,0 +1,21 @@
+
+BeeGo документация:
+    https://beego.me/docs/intro/
+
+Go: создание веб-приложения с помощью Beego:
+    http://www.internet-technologies.ru/articles/go-sozdanie-veb-prilozheniya-s-pomoschyu-beego.html
+
+Bulma is a free, open source CSS framework based on Flexbox and:
+    https://bulma.io/
+
+Beego Database Migration:
+    http://www.golangprograms.com/golang/beego-migration/
+
+Create database with migration beego #2962:
+    https://github.com/astaxie/beego/issues/2962
+
+
+=====
+Кодесранг:
+    https://profile.codersrank.io/user/richmanfx
+
