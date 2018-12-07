@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"../models"
 	"fmt"
 	"github.com/astaxie/beego/orm"
 	log "github.com/sirupsen/logrus"
@@ -71,9 +72,19 @@ func CheckUserInDB(login string) error {
 	//err = dbConnect()
 	//if err == nil {
 	//
-	//	// Считать из БД
-	//	requestResult := db.QueryRow("SELECT login FROM user WHERE login=?", login)
-	//
+
+	// Считать из БД
+	//requestResult := db.QueryRow("SELECT login FROM user WHERE login=?", login)
+
+	var o orm.Ormer
+	o = orm.NewOrm()
+
+	//user := new(User)
+
+	user := models.User{Login: login}
+	err = o.Read(&user)
+	fmt.Printf("ERR: %v\n", err)
+
 	//	err = requestResult.Scan(&loginFromDB)
 	//
 	//	if err == nil {
