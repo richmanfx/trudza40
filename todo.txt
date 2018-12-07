@@ -1,9 +1,10 @@
 
+- Скриншот с "Edit Configuratio" сделать.
 
-  - Авторизацию с солью
-    -- Сессии в Beego: http://37yonub.ru/articles/beego-sessions-with-postgres-rus
+- Авторизацию с солью
+   -- Сессии в Beego: http://37yonub.ru/articles/beego-sessions-with-postgres-rus
 
- - Сделать сертификат SSL на сайт: https://certbot.eff.org
+- Сделать сертификат SSL на сайт: https://certbot.eff.org
 
 
  Готово:
