@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	_ "github.com/astaxie/beego/migration"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
+	"trudza40/helpers"
 )
 
 type User struct {
@@ -16,6 +18,9 @@ type User struct {
 }
 
 func init() {
+
+	baseName, baseUserName, baseUserPassword := helpers.GetDbAccount()
+
 	// Регистрация модели
 	orm.RegisterModel(new(User))
 
@@ -26,10 +31,9 @@ func init() {
 	}
 
 	// БД по умолчанию
-	err = orm.RegisterDataBase(
-		"default",
-		"postgres",
-		"user=investor password=realty2018 host=127.0.0.1 port=5432 dbname=object_valuation sslmode=disable")
+	dataSourceString := fmt.Sprintf("user=%s password=%s host=127.0.0.1 port=5432 dbname=%s sslmode=disable",
+		baseUserName, baseUserPassword, baseName)
+	err = orm.RegisterDataBase("default", "postgres", dataSourceString)
 	if err != nil {
 		log.Panic("Ошибка регистрации базы данных PostgreSQL.")
 	}

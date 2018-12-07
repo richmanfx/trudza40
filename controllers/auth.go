@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"trudza40/helpers"
 )
 
 type AuthController struct {
@@ -19,7 +20,7 @@ func (context *AuthController) Login() {
 
 func (context *AuthController) LoginProcessing() {
 
-	var err = errors.New(fmt.Sprintln("err: 'Ошибка'"))
+	err := errors.New(fmt.Sprintln("err: 'Ошибка'"))
 	userName := context.GetString("user_name")
 
 	if userName == "Вася" {
@@ -29,6 +30,7 @@ func (context *AuthController) LoginProcessing() {
 	//userPassword := context.GetString("user_password")
 
 	// Проверить существование пользователя в базе	TODO
+	err = helpers.CheckUserInDB(userName)
 
 	// Проверить пароль по Хешу из БД	TODO
 

@@ -1,0 +1,6 @@
+
+# Place this file account.ini in /usr/local/etc
+
+DATABASENAME = <database_name>
+BASEUSERNAME = <database_user_name>
+BASEUSERPASSWORD = <database_user_password>

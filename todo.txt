@@ -1,12 +1,6 @@
 
 
- - Пробовать накат Миграций:
-        http://www.golangprograms.com/golang/beego-migration/
-        https://beego.me/docs/mvc/model/orm.md
-        https://godoc.org/github.com/lib/pq
-        https://github.com/astaxie/beego/issues/2962
-
- - Авторизацию с солью
+  - Авторизацию с солью
     -- Сессии в Beego: http://37yonub.ru/articles/beego-sessions-with-postgres-rus
 
  - Сделать сертификат SSL на сайт: https://certbot.eff.org
@@ -15,5 +9,13 @@
  Готово:
  =======
 
+- Вынести аккаунты в отдельный файл
+
+- Накатить Миграции:
+    http://www.golangprograms.com/golang/beego-migration/
+    https://beego.me/docs/mvc/model/orm.md
+    https://godoc.org/github.com/lib/pq
+    https://github.com/astaxie/beego/issues/2962
+
 - Модель с пользователем
- - Футер в центр
+- Футер в центр
