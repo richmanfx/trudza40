@@ -19,7 +19,7 @@
                 </div>
                     <div class="has-text-centered">
                         <button class="button is-success ">
-                            <a href="/login"> To Login </a>
+                            <a href="/login"> В начало </a>
                         </button>
                     </div>
             </article>

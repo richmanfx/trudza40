@@ -6,7 +6,7 @@ import (
 	"github.com/astaxie/beego"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"trudza40/helpers"
+	"trudza40/models"
 )
 
 type AuthController struct {
@@ -30,7 +30,7 @@ func (context *AuthController) LoginProcessing() {
 	//userPassword := context.GetString("user_password")
 
 	// Проверить существование пользователя в базе	TODO
-	err = helpers.CheckUserInDB(userName)
+	err = models.CheckUserInDB(userName)
 
 	// Проверить пароль по Хешу из БД	TODO
 
@@ -53,12 +53,11 @@ func (context *AuthController) LoginProcessing() {
 	} else {
 		// Вывод сообщения об ошибке в окне (модальном?)
 		log.Errorln("Ошибка авторизации - неверный логин/пароль.")
-		//context.TplName = "message.tpl"
 		context.TplName = "message-modal.tpl"
 		context.Data["title"] = "Ошибка"
 		context.Data["message1"] = "Ошибка"
 		context.Data["message2"] = "Ошибка авторизации - неверный логин/пароль."
-		context.Data["message3"] = err
+		//context.Data["message3"] = err
 
 	}
 }
