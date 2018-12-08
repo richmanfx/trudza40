@@ -7,8 +7,10 @@ import (
 	_ "github.com/astaxie/beego/migration"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/lib/pq"
+	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/ini.v1"
 	"log"
+	"strconv"
 )
 
 type User struct {
@@ -122,23 +124,23 @@ func CheckPasswordInDB(login, password string) error {
 
 	if err == nil {
 
-		//// Сгенерить Хеш пароля с Солью
-		//newHash := CreateHash(password, salt)
-		//beego.Info(fmt.Sprintf("Хеш с Солью: '%s'", newHash))
-		//
-		//// Считать Хеш из БД
-		//var oldHash string
-		//oldHash, err = GetHashFromDb(login)
-		//if err == nil {
-		//	err = bcrypt.CompareHashAndPassword([]byte(oldHash), []byte(password))
-		//}
-		//
-		//if err == nil {
-		//	beego.Info("Хеш пароля совпадает с Хешем из БД.")
-		//} else {
-		//	beego.Info("Хеш пароля не совпадает с Хешем из БД.")
-		//	err = errors.New(fmt.Sprintln("Неверный логин/пароль."))
-		//}
+		// Сгенерить Хеш пароля с Солью
+		newHash := CreateHash(password, salt)
+		beego.Info(fmt.Sprintf("Хеш с Солью: '%s'", newHash))
+
+		// Считать Хеш из БД
+		var oldHash string
+		oldHash, err = GetHashFromDb(login)
+		if err == nil {
+			err = bcrypt.CompareHashAndPassword([]byte(oldHash), []byte(password))
+		}
+
+		if err == nil {
+			beego.Info("Хеш пароля совпадает с Хешем из БД")
+		} else {
+			beego.Info("Хеш пароля не совпадает с Хешем из БД")
+			err = errors.New(fmt.Sprintln("Неверный логин/пароль"))
+		}
 	}
 	if err != nil {
 		beego.Info(fmt.Sprintf("Ошибка при проверке пароля по Хешу из БД: '%v'", err))
@@ -159,7 +161,6 @@ func GetSaltFromDb(userLogin string) (string, error) {
 	// Получить "соль"
 	user := User{Login: userLogin}
 	err = o.QueryTable("user").Filter("login", userLogin).One(&user, "salt") // Только Salt интересует
-	salt = user.Salt
 
 	if err == orm.ErrMultiRows {
 		fmt.Printf("Returned Multi Rows Not One") // Have multiple records
@@ -168,9 +169,49 @@ func GetSaltFromDb(userLogin string) (string, error) {
 		fmt.Printf("Not row found") // No result
 	}
 
+	salt = user.Salt
+
 	//defer db.Close()		// TODO: Пока не знаю закрывать ли...
 	if err != nil {
 		beego.Info(fmt.Sprintf("Ошибка получения 'соли' для пользователя с логином '%s': %v", userLogin, err))
 	}
 	return salt, err
+}
+
+// Получить Хеш пароля с заданной солью
+func CreateHash(password string, salt string) string {
+	intSalt, _ := strconv.Atoi(salt)
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), intSalt)
+	return string(hashedPassword)
+}
+
+// Получить хеш из БД для заданного пользователя
+func GetHashFromDb(userLogin string) (string, error) {
+
+	var err error
+	var hash string
+	var o orm.Ormer
+
+	o = orm.NewOrm() // Использовать ORM "Ormer"
+	orm.Debug = true // Логирование ORM запросов
+
+	// Получить "Хеш"
+	user := User{Login: userLogin}
+	err = o.QueryTable("user").Filter("login", userLogin).One(&user, "password") // Только Хеш пароля интересует
+
+	if err == orm.ErrMultiRows {
+		fmt.Printf("Returned Multi Rows Not One") // Have multiple records
+	}
+	if err == orm.ErrNoRows {
+		fmt.Printf("Not row found") // No result
+	}
+
+	hash = user.Password
+
+	//defer db.Close()		// TODO:
+	if err != nil {
+		beego.Info(
+			fmt.Sprintf("Ошибка получения из базы Хеша пароля для пользователя с логином '%s': %v", userLogin, err))
+	}
+	return hash, err
 }
