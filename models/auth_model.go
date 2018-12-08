@@ -1,12 +1,14 @@
 package models
 
 import (
+	"errors"
 	"fmt"
+	"github.com/astaxie/beego"
 	_ "github.com/astaxie/beego/migration"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/lib/pq"
-	log "github.com/sirupsen/logrus"
 	"gopkg.in/ini.v1"
+	"log"
 )
 
 type User struct {
@@ -27,7 +29,7 @@ func init() {
 	// Регистрация драйвера БД
 	err := orm.RegisterDriver("postgres", orm.DRPostgres)
 	if err != nil {
-		log.Panicf("Ошибка регистрации драйвера PostgreSQL: %v", err)
+		beego.Error(fmt.Sprintf("Ошибка регистрации драйвера PostgreSQL: %v", err))
 	}
 
 	// БД по умолчанию
@@ -46,34 +48,33 @@ func init() {
 
 // Проверить наличие пользователя в БД
 func CheckUserInDB(login string) error {
-
-	log.Info("Работает функция 'CheckUserInDB'")
+	beego.Info("Работает функция 'CheckUserInDB'")
 
 	var err error
-	//var loginFromDB string
-
-	// Считать из БД
-	//requestResult := db.QueryRow("SELECT login FROM user WHERE login=?", login)
-
 	var o orm.Ormer
-	o = orm.NewOrm()
+
+	o = orm.NewOrm() // Использовать ORM "Ormer"
+	orm.Debug = true // Логирование ORM запросов
 
 	user := User{Login: login}
-	err = o.Read(&user)
-	fmt.Printf("ERR: %v\n", err)
+	exist := o.QueryTable(user).Filter("login", login).Exist() // Существует ли в базе?
 
-	//	err = requestResult.Scan(&loginFromDB)
-	//
-	//	if err == nil {
-	//		log.Debugf("Пользователь '%s' существует", login)
-	//	} else {
-	//		err = errors.New(fmt.Sprintf("Пользователь '%s' в БД не существует", login))
-	//	}
-	//}
-	//defer db.Close()
+	if exist {
+		beego.Info(fmt.Sprintf("Пользователь существует: %d / %s / %s", user.Id, user.Login, user.FullName))
+	} else {
+		err = errors.New(fmt.Sprintf("Пользователь '%s' в БД не существует", login))
+	}
+
+	if err == orm.ErrNoRows {
+		beego.Error("Отсутствует результат запроса")
+	} else if err == orm.ErrMissPK {
+		beego.Error("Отсутствует 'primary key'")
+	}
+
+	//defer db.Close()		// TODO: Пока не закрываем - не ясно как
 
 	if err != nil {
-		log.Errorf("Ошибка при проверке наличия пользователя '%s' в БД: '%v'", login, err)
+		beego.Error(fmt.Sprintf("Ошибка при проверке наличия пользователя '%s' в БД: '%v'", login, err))
 	}
 	return err
 }
@@ -89,7 +90,7 @@ func getDbAccount() (baseName, baseUserName, baseUserPassword string) {
 
 	// Полное имя файла аккаунтов
 	fullAccountFileName := accountDirName + "/" + accountFileName
-	log.Debugf("Full config file name: %s", fullAccountFileName)
+	beego.Info(fmt.Sprintf("Full config file name: '%s'", fullAccountFileName))
 
 	// Чтение параметров из файла аккаунтов
 	getConfigParameters(fullAccountFileName, &baseName, &baseUserName, &baseUserPassword)
@@ -106,7 +107,7 @@ func getConfigParameters(fullConfigFileName string, baseName, baseUserName, base
 	}
 
 	*baseName = config.Section("").Key("DATABASENAME").String()
-	log.Infof("Используемая база данных: %s", *baseName)
+	beego.Info(fmt.Sprintf("Используемая база данных: '%s'", *baseName))
 
 	*baseUserName = config.Section("").Key("BASEUSERNAME").String()
 	*baseUserPassword = config.Section("").Key("BASEUSERPASSWORD").String()
