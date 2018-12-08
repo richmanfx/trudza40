@@ -21,7 +21,7 @@ func (context *AuthController) LoginProcessing() {
 
 	err := errors.New(fmt.Sprintln("err: 'Ошибка'"))
 	userName := context.GetString("user_name")
-	//userPassword := context.GetString("user_password")
+	userPassword := context.GetString("user_password")
 
 	//if userName == "Вася" {
 	//	err = nil
@@ -31,6 +31,10 @@ func (context *AuthController) LoginProcessing() {
 	err = models.CheckUserInDB(userName)
 
 	// Проверить пароль по Хешу из БД	TODO
+	if err == nil {
+		// Можно закомментировать для возможности залогиниться без Хешей из БД
+		err = models.CheckPasswordInDB(userName, userPassword)
+	}
 
 	if err == nil {
 		beego.Info(fmt.Sprintf("Пользователь '%s' вошёл в приложение.", userName))

@@ -112,3 +112,65 @@ func getConfigParameters(fullConfigFileName string, baseName, baseUserName, base
 	*baseUserName = config.Section("").Key("BASEUSERNAME").String()
 	*baseUserPassword = config.Section("").Key("BASEUSERPASSWORD").String()
 }
+
+// Проверить пароль по Хешу из БД
+func CheckPasswordInDB(login, password string) error {
+
+	// Получить Соль из БД
+	salt, err := GetSaltFromDb(login)
+	beego.Info(fmt.Sprintf("Соль из БД: '%s'", salt))
+
+	if err == nil {
+
+		//// Сгенерить Хеш пароля с Солью
+		//newHash := CreateHash(password, salt)
+		//beego.Info(fmt.Sprintf("Хеш с Солью: '%s'", newHash))
+		//
+		//// Считать Хеш из БД
+		//var oldHash string
+		//oldHash, err = GetHashFromDb(login)
+		//if err == nil {
+		//	err = bcrypt.CompareHashAndPassword([]byte(oldHash), []byte(password))
+		//}
+		//
+		//if err == nil {
+		//	beego.Info("Хеш пароля совпадает с Хешем из БД.")
+		//} else {
+		//	beego.Info("Хеш пароля не совпадает с Хешем из БД.")
+		//	err = errors.New(fmt.Sprintln("Неверный логин/пароль."))
+		//}
+	}
+	if err != nil {
+		beego.Info(fmt.Sprintf("Ошибка при проверке пароля по Хешу из БД: '%v'", err))
+	}
+	return err
+}
+
+// Получить "соль" из БД для заданного пользователя
+func GetSaltFromDb(userLogin string) (string, error) {
+
+	var err error
+	var salt string
+	var o orm.Ormer
+
+	o = orm.NewOrm() // Использовать ORM "Ormer"
+	orm.Debug = true // Логирование ORM запросов
+
+	// Получить "соль"
+	user := User{Login: userLogin}
+	err = o.QueryTable("user").Filter("login", userLogin).One(&user, "salt") // Только Salt интересует
+	salt = user.Salt
+
+	if err == orm.ErrMultiRows {
+		fmt.Printf("Returned Multi Rows Not One") // Have multiple records
+	}
+	if err == orm.ErrNoRows {
+		fmt.Printf("Not row found") // No result
+	}
+
+	//defer db.Close()		// TODO: Пока не знаю закрывать ли...
+	if err != nil {
+		beego.Info(fmt.Sprintf("Ошибка получения 'соли' для пользователя с логином '%s': %v", userLogin, err))
+	}
+	return salt, err
+}
