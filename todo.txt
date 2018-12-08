@@ -1,5 +1,5 @@
 
-- Скриншот с "Edit Configuratio" сделать.
+
 
 - Авторизацию с солью
    -- Сессии в Beego: http://37yonub.ru/articles/beego-sessions-with-postgres-rus
@@ -9,6 +9,8 @@
 
  Готово:
  =======
+
+- Скриншот с "Edit Configuration" сделать
 
 - Вынести аккаунты в отдельный файл
 
