@@ -1,6 +1,7 @@
 package models
 
 import (
+	"crypto/sha512"
 	"errors"
 	"fmt"
 	"github.com/astaxie/beego"
@@ -9,8 +10,10 @@ import (
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/ini.v1"
+	"io"
 	"log"
 	"strconv"
+	"time"
 )
 
 type User struct {
@@ -48,15 +51,13 @@ func init() {
 	}
 }
 
-// Проверить наличие пользователя в БД
+/* Проверить наличие пользователя в БД */
 func CheckUserInDB(login string) error {
 	beego.Info("Работает функция 'CheckUserInDB'")
 
 	var err error
-	var o orm.Ormer
-
-	o = orm.NewOrm() // Использовать ORM "Ormer"
-	orm.Debug = true // Логирование ORM запросов
+	o := orm.NewOrm() // Использовать ORM "Ormer"
+	orm.Debug = true  // Логирование ORM запросов
 
 	user := User{Login: login}
 	exist := o.QueryTable(user).Filter("login", login).Exist() // Существует ли в базе?
@@ -81,7 +82,7 @@ func CheckUserInDB(login string) error {
 	return err
 }
 
-// Вернуть имя БД, имя пользователя в БД и его пароль
+/* Вернуть имя БД, имя пользователя в БД и его пароль */
 func getDbAccount() (baseName, baseUserName, baseUserPassword string) {
 
 	// Файл аккаунтов
@@ -100,7 +101,7 @@ func getDbAccount() (baseName, baseUserName, baseUserPassword string) {
 	return baseName, baseUserName, baseUserPassword
 }
 
-// Получить параметры из конфигурационного INI файла
+/* Получить параметры из конфигурационного INI файла */
 func getConfigParameters(fullConfigFileName string, baseName, baseUserName, baseUserPassword *string) {
 
 	config, err := ini.Load(fullConfigFileName)
@@ -115,7 +116,7 @@ func getConfigParameters(fullConfigFileName string, baseName, baseUserName, base
 	*baseUserPassword = config.Section("").Key("BASEUSERPASSWORD").String()
 }
 
-// Проверить пароль по Хешу из БД
+/* Проверить пароль по Хешу из БД */
 func CheckPasswordInDB(login, password string) error {
 
 	// Получить Соль из БД
@@ -148,19 +149,15 @@ func CheckPasswordInDB(login, password string) error {
 	return err
 }
 
-// Получить "соль" из БД для заданного пользователя
+/* Получить "соль" из БД для заданного пользователя */
 func GetSaltFromDb(userLogin string) (string, error) {
 
-	var err error
-	var salt string
-	var o orm.Ormer
-
-	o = orm.NewOrm() // Использовать ORM "Ormer"
-	orm.Debug = true // Логирование ORM запросов
+	o := orm.NewOrm() // Использовать ORM "Ormer"
+	orm.Debug = true  // Логирование ORM запросов
 
 	// Получить "соль"
 	user := User{Login: userLogin}
-	err = o.QueryTable("user").Filter("login", userLogin).One(&user, "salt") // Только Salt интересует
+	err := o.QueryTable("user").Filter("login", userLogin).One(&user, "salt") // Только Salt интересует
 
 	if err == orm.ErrMultiRows {
 		fmt.Printf("Returned Multi Rows Not One") // Have multiple records
@@ -169,7 +166,7 @@ func GetSaltFromDb(userLogin string) (string, error) {
 		fmt.Printf("Not row found") // No result
 	}
 
-	salt = user.Salt
+	salt := user.Salt
 
 	//defer db.Close()		// TODO: Пока не знаю закрывать ли...
 	if err != nil {
@@ -178,26 +175,22 @@ func GetSaltFromDb(userLogin string) (string, error) {
 	return salt, err
 }
 
-// Получить Хеш пароля с заданной солью
+/* Получить Хеш пароля с заданной солью */
 func CreateHash(password string, salt string) string {
 	intSalt, _ := strconv.Atoi(salt)
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), intSalt)
 	return string(hashedPassword)
 }
 
-// Получить хеш из БД для заданного пользователя
+/* Получить хеш из БД для заданного пользователя */
 func GetHashFromDb(userLogin string) (string, error) {
 
-	var err error
-	var hash string
-	var o orm.Ormer
-
-	o = orm.NewOrm() // Использовать ORM "Ormer"
-	orm.Debug = true // Логирование ORM запросов
+	o := orm.NewOrm() // Использовать ORM "Ormer"
+	orm.Debug = true  // Логирование ORM запросов
 
 	// Получить "Хеш"
 	user := User{Login: userLogin}
-	err = o.QueryTable("user").Filter("login", userLogin).One(&user, "password") // Только Хеш пароля интересует
+	err := o.QueryTable("user").Filter("login", userLogin).One(&user, "password") // Только Хеш пароля интересует
 
 	if err == orm.ErrMultiRows {
 		fmt.Printf("Returned Multi Rows Not One") // Have multiple records
@@ -206,7 +199,7 @@ func GetHashFromDb(userLogin string) (string, error) {
 		fmt.Printf("Not row found") // No result
 	}
 
-	hash = user.Password
+	hash := user.Password
 
 	//defer db.Close()		// TODO:
 	if err != nil {
@@ -214,4 +207,37 @@ func GetHashFromDb(userLogin string) (string, error) {
 			fmt.Sprintf("Ошибка получения из базы Хеша пароля для пользователя с логином '%s': %v", userLogin, err))
 	}
 	return hash, err
+}
+
+/* Создать пользователя в БД */
+func CreateUserInDbProcessing(user User) error {
+
+	o := orm.NewOrm() // Использовать ORM "Ormer"
+	orm.Debug = true  // Логирование ORM запросов
+
+	beego.Info("user в 'CreateUserInDb': '%v'", user)
+
+	id, err := o.Insert(&user)
+	if err == nil {
+		beego.Info(fmt.Sprintf("Record Id: '%d'", id))
+	}
+
+	// 	defer db.Close()		TODO
+
+	if err != nil {
+		beego.Error(fmt.Sprintf("Ошибка при создании пользователя в БД: '%v'", err))
+	}
+	return err
+}
+
+/* Сгенерировать "соль" */
+func CreateSalt() string {
+	hash := sha512.New()
+	_, err := io.WriteString(hash, time.Now().String())
+
+	if err != nil {
+		beego.Error("Ошибка при генерации соли")
+	}
+
+	return fmt.Sprintf("%x", hash.Sum(nil))
 }

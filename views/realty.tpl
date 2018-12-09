@@ -5,7 +5,12 @@
 <div class="columns">
     <div class="column ">
         <div class="content has-text-centered">
-            Недвижимость
+            <a class="button is-link" title="Скрапинг 'torgi.gov.ru'">
+                <strong>torgi.gov.ru</strong>
+            </a>
+            <a class="button is-link" title="Скрапинг 'второго сайта'">
+                <strong>второй.сайт.ru</strong>
+            </a>
         </div>
     </div>
 </div>

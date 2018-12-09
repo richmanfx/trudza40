@@ -55,11 +55,11 @@ func (context *AuthController) LoginProcessing() {
 	} else {
 		beego.Error("Ошибка авторизации - неверный логин/пароль.")
 
-		// Вывод сообщения об ошибке в окне модальном
+		// Вывод сообщения об ошибке в модальном окне
 		context.TplName = "message-modal.tpl"
 		context.Data["title"] = "Ошибка"
 		context.Data["message1"] = "Ошибка"
-		context.Data["message2"] = "Ошибка авторизации - неверный логин/пароль."
+		context.Data["message2"] = "Ошибка авторизации - неверный логин/пароль"
 		//context.Data["message3"] = err
 
 	}

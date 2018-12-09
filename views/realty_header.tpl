@@ -26,6 +26,5 @@
 <body>
 <div class="hero is-fullheight">
 
-
-
-    <!-- Шаблон меню -->
+<!-- Шаблон основного меню -->
+{{ template "navbar-menu.tpl" . }}

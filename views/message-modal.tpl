@@ -7,7 +7,7 @@
     <div class="modal-content">
 
         <div class="box">
-            <article class="message is-danger">
+            <article class="message">
                 <div class="message-header">
                     <h1>{{ .message1 }}</h1>
                 </div>
