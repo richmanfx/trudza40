@@ -23,14 +23,10 @@ func (context *AuthController) LoginProcessing() {
 	userName := context.GetString("user_name")
 	userPassword := context.GetString("user_password")
 
-	//if userName == "Вася" {
-	//	err = nil
-	//}
-
 	// Проверить существование пользователя в базе
 	err = models.CheckUserInDB(userName)
 
-	// Проверить пароль по Хешу из БД	TODO
+	// Проверить пароль по Хешу из БД
 	if err == nil {
 		// Можно закомментировать для возможности залогиниться без Хешей из БД
 		err = models.CheckPasswordInDB(userName, userPassword)

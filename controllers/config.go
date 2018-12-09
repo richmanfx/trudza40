@@ -18,8 +18,24 @@ func (context *ConfigController) EditConfig() {
 
 /* Конфигурирование пользователей */
 func (context *ConfigController) UsersConfig() {
-	context.TplName = "users-config.tpl"
-	context.Data["title"] = "Users Config"
+
+	// Считать из БД пользователей
+	users, err := models.GetUsers()
+	beego.Info(fmt.Sprintf("Пользователи из БД: '%v'", users))
+
+	if err == nil {
+		context.TplName = "users-config.tpl"
+		context.Data["title"] = "Users Config"
+		context.Data["users"] = users
+	} else {
+		beego.Error("Ошибка при получении данных о пользователях из БД")
+		// Вывод сообщения об ошибке в модальном окне
+		context.TplName = "message-modal.tpl"
+		context.Data["title"] = "Ошибка"
+		context.Data["message1"] = "Ошибка"
+		context.Data["message2"] = "Ошибка при получении данных о пользователях из БД"
+		context.Data["message3"] = err
+	}
 }
 
 /* Ввести данные нового пользователя в модальной форме */

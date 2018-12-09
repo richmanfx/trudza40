@@ -241,3 +241,21 @@ func CreateSalt() string {
 
 	return fmt.Sprintf("%x", hash.Sum(nil))
 }
+
+/* Считать из БД всех пользователей */
+func GetUsers() ([]User, error) {
+
+	o := orm.NewOrm() // Использовать ORM "Ormer"
+	orm.Debug = true  // Логирование ORM запросов
+
+	var usersList []User
+
+	// Считать из БД
+	_, err := o.QueryTable("user").OrderBy("Id").All(&usersList)
+
+	//defer db.Close()		// TODO:
+	if err != nil {
+		beego.Error(fmt.Sprintf("Ошибка при считывании из БД всех пользователей: '%v'", err))
+	}
+	return usersList, err
+}
