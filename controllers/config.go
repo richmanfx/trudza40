@@ -90,8 +90,7 @@ func (context *ConfigController) DeleteUser() {
 	user.Login = context.GetString("login")
 	user.FullName = context.GetString("full_name")
 
-	//TODO:  Закончил здесь
-	err := models.DeleteUserInDbProcessing(*user)
+	err := models.DeleteUserInDb(*user)
 
 	if err == nil {
 		beego.Info("Пользователь удачно удалён")

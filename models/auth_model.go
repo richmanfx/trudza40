@@ -215,8 +215,6 @@ func CreateUserInDbProcessing(user User) error {
 	o := orm.NewOrm() // Использовать ORM "Ormer"
 	orm.Debug = true  // Логирование ORM запросов
 
-	beego.Info("user в 'CreateUserInDb': '%v'", user)
-
 	id, err := o.Insert(&user)
 	if err == nil {
 		beego.Info(fmt.Sprintf("Record Id: '%d'", id))
@@ -258,4 +256,22 @@ func GetUsers() ([]User, error) {
 		beego.Error(fmt.Sprintf("Ошибка при считывании из БД всех пользователей: '%v'", err))
 	}
 	return usersList, err
+}
+
+/* Удалить пользователя из БД */
+func DeleteUserInDb(user User) error {
+
+	o := orm.NewOrm() // Использовать ORM "Ormer"
+	orm.Debug = true  // Логирование ORM запросов
+
+	id, err := o.QueryTable("user").Filter("login", user.Login).Filter("full_name", user.FullName).Delete()
+	if err == nil {
+		beego.Info(fmt.Sprintf("Deleted record ID: '%d'", id))
+	}
+
+	//defer db.Close()		// TODO
+	if err != nil {
+		beego.Error(fmt.Sprintf("Ошибка при удалении пользователя '%s' в БД: '%v'", user.Login, err))
+	}
+	return err
 }
