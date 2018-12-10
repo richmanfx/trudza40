@@ -1,2 +1,2 @@
 # Не использовать эти директории для определение языка проекта
-static/сss/* linguist-vendored
+static/* linguist-vendored
