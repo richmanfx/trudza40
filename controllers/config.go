@@ -44,7 +44,7 @@ func (context *ConfigController) CreateUser() {
 	context.Data["title"] = "Create User"
 }
 
-/* Создать нового пользователя в БД  */
+/* Создать нового пользователя в БД */
 func (context *ConfigController) CreateUserInDb() {
 
 	// Пользователь
@@ -76,6 +76,38 @@ func (context *ConfigController) CreateUserInDb() {
 		context.Data["title"] = "Ошибка"
 		context.Data["message1"] = "Ошибка"
 		context.Data["message2"] = "Создать пользователя не удалось"
+		context.Data["message3"] = err
+	}
+}
+
+/* Удалить пользователя */
+func (context *ConfigController) DeleteUser() {
+
+	// Пользователь
+	user := new(models.User)
+
+	// Данные из формы
+	user.Login = context.GetString("login")
+	user.FullName = context.GetString("full_name")
+
+	//TODO:  Закончил здесь
+	err := models.DeleteUserInDbProcessing(*user)
+
+	if err == nil {
+		beego.Info("Пользователь удачно удалён")
+
+		context.TplName = "message-modal.tpl"
+		context.Data["title"] = "Info"
+		context.Data["message1"] = "Информация"
+		context.Data["message2"] = fmt.Sprintf("Пользователь '%s' удачно удалён", user.Login)
+
+	} else {
+		beego.Error("Удалить пользователя не удалось")
+
+		context.TplName = "message-modal.tpl"
+		context.Data["title"] = "Ошибка"
+		context.Data["message1"] = "Ошибка"
+		context.Data["message2"] = "Удалить пользователя не удалось"
 		context.Data["message3"] = err
 	}
 }

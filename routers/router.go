@@ -14,4 +14,5 @@ func init() {
 	beego.Router("/users-config", &controllers.ConfigController{}, "get:UsersConfig")
 	beego.Router("/create-user", &controllers.ConfigController{}, "get:CreateUser")
 	beego.Router("/create-user-in-db", &controllers.ConfigController{}, "post:CreateUserInDb")
+	beego.Router("/delete-user", &controllers.ConfigController{}, "post:DeleteUser")
 }
