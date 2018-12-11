@@ -110,3 +110,37 @@ func (context *ConfigController) DeleteUser() {
 		context.Data["message3"] = err
 	}
 }
+
+/* Изменить пароль пользователя */
+func (context *ConfigController) ChangePassword() {
+
+	// Пользователь
+	user := new(models.User)
+
+	// Данные из формы
+	user.Login = context.GetString("login")
+	user.FullName = context.GetString("full_name")
+	user.Password = context.GetString("new_password")
+
+	// Записать в БД новый пароль
+	err := models.SavePassword(*user)
+
+	if err == nil {
+		beego.Info("Пароль пользователя удачно изменён")
+		// Вывод сообщения об удачном создании пользователя
+		context.TplName = "message-modal.tpl"
+		context.Data["title"] = "Info"
+		context.Data["message1"] = "Информация"
+		context.Data["message2"] = fmt.Sprintf("Пароль пользователя '%s' удачно изменён", user.Login)
+
+	} else {
+		beego.Error("Изменить пароль пользователя не удалось")
+		// Вывод сообщения об ошибке в модальном окне
+		context.TplName = "message-modal.tpl"
+		context.Data["title"] = "Ошибка"
+		context.Data["message1"] = "Ошибка"
+		context.Data["message2"] = "Изменить пароль пользователя не удалось"
+		context.Data["message3"] = err
+	}
+
+}

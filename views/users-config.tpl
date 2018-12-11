@@ -1,6 +1,7 @@
 {{ template "realty_header.tpl" .}}
 
 {{ template "delete-user-modal.tpl" . }}
+{{ template "change-password-modal.tpl" . }}
 
 <div class="columns">
     <div class="column"></div>
@@ -25,13 +26,13 @@
                         <td>{{ $val.Login }}</td>
                         <td>{{ $val.FullName }}</td>
                         <td>
-                            <a class="delete-user" data-target="delete-user" href="#" title="Удалить пользователя"
-                               data-login="{{ $val.Login }}" data-name="{{ $val.FullName }}" >
-                                <img data-login="{{ $val.Login }}" data-name="{{ $val.FullName }}" src="/static/img/delete.png" alt="Delete" width="20" height="20"/>
+                            <a class="delete-user" title="Удалить пользователя"
+                               data-login="{{ $val.Login }}" data-name="{{ $val.FullName }}">
+                                <img src="/static/img/delete.png" alt="Delete user" width="20" height="20"/>
                             </a>
-                            <a data-toggle="modal" data-target="#changePassword" href="#" title="Новый пароль"
-                               data-login="{{ $val.Login }}">
-                                <img src="/static/img/password.png" alt="Delete" width="20" height="20"/>
+                            <a class="change-password" title="Изменить пароль"
+                               data-login="{{ $val.Login }}" data-name="{{ $val.FullName }}">
+                                <img src="/static/img/password.png" alt="Change password" width="20" height="20"/>
                             </a>
                         </td>
                     </tr>

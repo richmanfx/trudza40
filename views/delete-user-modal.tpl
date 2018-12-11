@@ -1,10 +1,11 @@
-<div class="modal   ">
+<div class="delete-user-modal modal">
     <div class="modal-background">
     </div>
     <div class="modal-content">
-        Удалить пользователя
 
         <div class="box">
+            <span class="has-text-danger is-size-4 has-text-weight-bold">Удалить пользователя</span>
+            <hr>
             <form id="id_delete_user_form" name="delete_user_form" method="post" action="/delete-user">
                 <label class="label is-medium" for="id_login"> Логин </label>
                 <input class="input is-medium is-primary" id="id_login" name="login" required>
@@ -19,6 +20,7 @@
         </div>
 
         <!-- Автофокус в поле ввода в модальном окне -->
+        {{/*TODO: Отладить - по id не находит?  */}}
         <script>
             $('#deleteUser').on('shown.bs.modal', function (e) {
                 $('#id_login', e.target).focus();

@@ -275,3 +275,33 @@ func DeleteUserInDb(user User) error {
 	}
 	return err
 }
+
+/* Записать в БД новый пароль заданного пользователя */
+func SavePassword(user User) error {
+
+	o := orm.NewOrm() // Использовать ORM "Ormer"
+	orm.Debug = true  // Логирование ORM запросов
+
+	// Сгенерировать новую соль
+	salt := CreateSalt()
+	beego.Info(fmt.Sprintf("Новая Соль: '%s'", salt))
+
+	// Сгенерить Хеш пароля с Солью
+	newHash := CreateHash(user.Password, salt)
+	beego.Info(fmt.Sprintf("Хеш с Солью: '%s'", newHash))
+
+	// Занести новый хеш пароля и новую соль в БД
+	id, err :=
+		o.QueryTable("user").
+			Filter("login", user.Login).
+			Filter("full_name", user.FullName).
+			Update(orm.Params{"password": newHash, "salt": salt})
+	if err == nil {
+		beego.Info(fmt.Sprintf("Updated record ID: '%d'", id))
+	}
+
+	if err != nil {
+		beego.Error(fmt.Sprintf("Ошибка записи в БД нового пароля пользователя: '%v'", err))
+	}
+	return err
+}
