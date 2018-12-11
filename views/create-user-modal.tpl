@@ -4,13 +4,16 @@
     <div class="modal-background">
     </div>
     <div class="modal-content">
-        Создать нового пользователя
 
-        <div class="box">
+        <div class="box box-new-user">
+
+            <span class="has-text-danger is-size-4 has-text-weight-bold">Создать нового пользователя</span>
+            <hr>
+
             <form id="id_create_user_form" name="create_user_form" method="post" action="/create-user-in-db">
 
                 <label class="label is-medium" for="id_login"> Логин </label>
-                <input id="id_login" class="input is-medium is-primary" name="login"
+                <input id="id_login" class="input is-medium is-primary login" name="login"
                        placeholder=" Логин" required>
                 <br>
                 <br>
@@ -40,6 +43,11 @@
                         </a>
                     </p>
                 </div>
+
+                <!-- Автофокус в поле ввода в модальном окне -->
+                <script>
+                    $('#id_login').focus();
+                </script>
 
                 {{/*<label> Права </label>*/}}
                 {{/*<div class="with-border">*/}}
