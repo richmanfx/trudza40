@@ -2,14 +2,14 @@
     <div class="modal-background">
     </div>
     <div class="modal-content">
-        <div class="box">
+        <div class="box box-change">
             <span class="has-text-danger is-size-4 has-text-weight-bold">Изменение пароля пользователя</span>
             <hr>
 
             <form id="id_change_password_form" method="post" action="/change-password">
 
-                <label class="label is-medium" for="id_login"> Пользователь </label>
-                <input class="input is-medium is-primary" id="id_login" name="login" required>
+                <label class="label is-medium" for="id_login_change"> Пользователь </label>
+                <input class="input is-medium is-primary" id="id_login_change" name="login" required>
                 <br>
                 <br>
 
@@ -18,16 +18,18 @@
                        name="new_password" type="password" required>
                 <br>
                 <br>
-                <input type="hidden" name="full_name" id="id_full_name">
+                <input type="hidden" name="full_name">
             </form>
         </div>
 
         <!-- Автофокус в поле ввода в модальном окне -->
-        {{/*TODO: Отладить - по id не находит?  */}}
         <script>
-            $('#deleteUser').on('shown.bs.modal', function (e) {
-                $('#id_login', e.target).focus();
+
+            // При перемещении мыши по боксу с полями вода
+            $('.box-change').hover(function(event) {
+                $('#id_new_password', event.target).focus();
             });
+
         </script>
 
         <div class="modal-footer">

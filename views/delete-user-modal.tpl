@@ -7,8 +7,8 @@
             <span class="has-text-danger is-size-4 has-text-weight-bold">Удалить пользователя</span>
             <hr>
             <form id="id_delete_user_form" name="delete_user_form" method="post" action="/delete-user">
-                <label class="label is-medium" for="id_login"> Логин </label>
-                <input class="input is-medium is-primary" id="id_login" name="login" required>
+                <label class="label is-medium" for="id_login_delete"> Логин </label>
+                <input class="input is-medium is-primary" id="id_login_delete" name="login" required>
                 <br>
                 <br>
 
@@ -18,14 +18,6 @@
                 <br>
             </form>
         </div>
-
-        <!-- Автофокус в поле ввода в модальном окне -->
-        {{/*TODO: Отладить - по id не находит?  */}}
-        <script>
-            $('#deleteUser').on('shown.bs.modal', function (e) {
-                $('#id_login', e.target).focus();
-            });
-        </script>
 
         <div class="modal-footer">
             <button class="button is-link" form="id_delete_user_form">

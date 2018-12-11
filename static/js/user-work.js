@@ -19,7 +19,7 @@ $(document).ready(function() {
 
         // В input-ы вставить значения из "data-*"
         let modal_box = $('.box');
-        modal_box.find('#id_login').val(deletedLogin);
+        modal_box.find('#id_login_delete').val(deletedLogin);
         modal_box.find('#id_full_name').val(deletedFullName);
     });
 
@@ -36,7 +36,7 @@ $(document).ready(function() {
 
         // В input-ы вставить значения из "data-*"
         let modal_box = $('.box');
-        modal_box.find('#id_login').val(Login);
+        modal_box.find('#id_login_change').val(Login);
         modal_box.find('#id_full_name').val(deletedFullName);
 
     });
