@@ -1,16 +1,8 @@
-<nav class="navbar is-dark" role="navigation" aria-label="main navigation">
-    {{/*<div class="navbar-brand">*/}}
-        {{/*<a class="navbar-item" href="https://bulma.io">*/}}
-            {{/*<img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">*/}}
-        {{/*</a>*/}}
 
-        {{/*<a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false"*/}}
-           {{/*data-target="navbarBasicExample">*/}}
-            {{/*<span aria-hidden="true"></span>*/}}
-            {{/*<span aria-hidden="true"></span>*/}}
-            {{/*<span aria-hidden="true"></span>*/}}
-        {{/*</a>*/}}
-    {{/*</div>*/}}
+{{/* Шаблон модального окна "О программе" */}}
+{{ template "about-modal.tpl" . }}
+
+<nav class="navbar is-dark" role="navigation" aria-label="main navigation">
 
     <div id="navbarBasicExample" class="navbar-menu">
         <div class="navbar-start">
@@ -38,7 +30,7 @@
             </div>
 
 
-            <a class="navbar-item">
+            <a class="navbar-item" id="about-menu">
                 О программе
             </a>
 
@@ -57,4 +49,9 @@
             </div>
         </div>
     </div>
+
+
+
+    <script async src="/static/js/menu-work.js"></script>
+
 </nav>

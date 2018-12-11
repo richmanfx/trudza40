@@ -1,4 +1,3 @@
-<!-- Шаблон хедера -->
 {{ template "realty_header.tpl" .}}
 
 
