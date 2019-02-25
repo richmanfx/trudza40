@@ -1,5 +1,5 @@
 Замена favicon в браузере:
-
+--------------------------
 cd views
 # assume you have put the favicon.ico in this directory
 base64 -w0 favicon.ico > favicon.b64
@@ -7,4 +7,11 @@ cp index.tpl index.tpl.old
 sed 's/base64,.*"/base64,\n"/' index.tpl.old | sed '7r favicon.b64' > index.tpl
 # rm favicon.ico favicon.b64  index.tpl.old # remove the temp file
 ================================================================================
+
+
+
+Инсталляция Bee tool:
+---------------------
+go get github.com/beego/bee
+go install github.com/beego/bee
 

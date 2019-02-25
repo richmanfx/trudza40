@@ -20,6 +20,7 @@ now = datetime.datetime.now()
 current_date = str(now.strftime("%Y%m%d"))
 archive_file_name = project_name + ".tar.gz"
 project_dir = home_dir + os.path.sep + "go" + os.path.sep + "src" + os.path.sep + project_name
+server_os = "freebsd"
 
 
 @task(default=True)
@@ -29,8 +30,14 @@ def start():
     send_to_remote_server()
     make_backup()
     app_stop()
-    app_start()
-    check_app_running()
+
+    # Не работает никак -
+    # app_start()
+
+    delete_old_app()
+    deploy_new_app()
+
+    # check_app_running()
 
 
 @task()
@@ -39,7 +46,7 @@ def make_archive():
     print("\n ==> Make archive ...")
 
     local("cd " + project_dir + "; " +
-          home_dir + os.path.sep + "go/bin/bee pack;" +
+          home_dir + os.path.sep + "go/bin/bee pack -be=GOOS=" + server_os + ";" +
           "echo; " +
           "ls -la | grep '{0}'".format(archive_file_name)
           )
@@ -81,10 +88,20 @@ def app_stop():
     print("Stopping application complete")
 
 
-# 5.Удалить старый проект
+@task()
+def delete_old_app():
+    """ Deleting old application on remote server """
+    print("\n ==> Deleting old application on remote server ...")
+    run("/usr/local/sbin/delete_" + project_name)
+    print("Deleting application complete")
 
 
-# 6.Развернуть новый проект
+@task()
+def deploy_new_app():
+    """ Deploy new application on remote server """
+    print("\n ==> Deploy new application on remote server ...")
+    run("/usr/local/sbin/deploy_" + project_name)
+    print("Deploy complete")
 
 
 @task()
