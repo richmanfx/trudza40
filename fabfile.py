@@ -6,7 +6,7 @@ import datetime
 
 from fabric.api import task
 from fabric.state import env
-from fabric.operations import run, local, prompt, put
+from fabric.operations import run, local, put
 
 from fabconf import REMOTE_HOST, REMOTE_PORT, REMOTE_USER
 
@@ -123,7 +123,6 @@ def check_app_running():
         print("\nApplication started on remote server normally")
     else:
         print("\nError: Application not started on remote server!!!")
-
 
 
 # 9.Послать месседж админу
