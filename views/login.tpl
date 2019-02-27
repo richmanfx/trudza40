@@ -4,7 +4,7 @@
 <div class="columns">
     <div class="column"></div>
     <div class="column">
-        <form method="post" class="" action="/login-processing">
+        <form method="post" class="" action="/realty/login-processing">
 
             <div class="field">
                 <label class="label is-medium">Логин:</label>

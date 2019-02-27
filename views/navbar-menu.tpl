@@ -17,13 +17,13 @@
                     Конфигурация
                 </a>
                 <div class="navbar-dropdown">
-                    <a class="navbar-item" href="/users-config">
+                    <a class="navbar-item" href="/realty/users-config">
                         Работа с Пользователями
                     </a>
-                    <a class="navbar-item" href="/main-settings">
+                    <a class="navbar-item" href="/realty/main-settings">
                         Основные настройки
                     </a>
-                    <a class="navbar-item" href="/object-parameters">
+                    <a class="navbar-item" href="/realty/object-parameters">
                         Параметры объекта
                     </a>
                 </div>
