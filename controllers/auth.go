@@ -12,19 +12,20 @@ type AuthController struct {
 	beego.Controller
 }
 
-func (context *AuthController) Login() {
-	context.TplName = "login.tpl"
-	context.Data["title"] = "Realty Login"
+func (controller *AuthController) Login() {
+	controller.TplName = "login.tpl"
+	controller.Data["title"] = "Realty Login"
 }
 
-func (context *AuthController) LoginProcessing() {
+func (controller *AuthController) LoginProcessing() {
 
 	err := errors.New(fmt.Sprintln("err: 'Ошибка'"))
-	userName := context.GetString("user_name")
-	userPassword := context.GetString("user_password")
+	userName := controller.GetString("user_name")
+	userPassword := controller.GetString("user_password")
+	var userId int
 
 	// Проверить существование пользователя в базе
-	err = models.CheckUserInDB(userName)
+	userId, err = models.CheckUserInDB(userName)
 
 	// Проверить пароль по Хешу из БД
 	if err == nil {
@@ -34,29 +35,58 @@ func (context *AuthController) LoginProcessing() {
 
 	if err == nil {
 		beego.Info(fmt.Sprintf("Пользователь '%s' вошёл в приложение.", userName))
-		//helpers.UserLogin = userName	// Логин пользователя в заголовок
 
-		// Изменить сессию
+		// Логин пользователя в заголовок
+		//helpers.UserLogin = userName		// TODO: Пока не реализовано
 
-		// Сгенерировать sessid
+		// Добавить куку с ID полльзователя
+		err = userSession.Set("UserID", userId)
+		if err != nil {
+			beego.Error("Не добавился UserID")
+		}
 
-		// Сохранить сессию в БД
+		// Новая сессия с новой кукой
+		userID := controller.StartSession().Get("UserID") // Новая сессия
+		beego.Info(fmt.Sprintf("UserID: %v", userID))
+		if userID == nil {
+			return
+		}
 
-		// Выставить в браузере Куки
-
-		// Направить на индексную страницу
-		//context.Abort(string(http.StatusOK))
-		context.Redirect("/realty", http.StatusSeeOther)
+		controller.Redirect("/realty", http.StatusSeeOther)
 
 	} else {
 		beego.Error("Ошибка авторизации - неверный логин/пароль.")
 
 		// Вывод сообщения об ошибке в модальном окне
-		context.TplName = "message-modal.tpl"
-		context.Data["title"] = "Ошибка"
-		context.Data["message1"] = "Ошибка"
-		context.Data["message2"] = "Ошибка авторизации - неверный логин/пароль"
-		//context.Data["message3"] = err
+		controller.TplName = "message-modal.tpl"
+		controller.Data["title"] = "Ошибка"
+		controller.Data["message1"] = "Ошибка"
+		controller.Data["message2"] = "Ошибка авторизации - неверный логин/пароль"
+	}
+}
 
+/* Разлогинивание */
+func (controller *AuthController) Logout() {
+	// Check if user is logged in
+	session := controller.StartSession()
+	userID := session.Get("UserID")
+	beego.Info(fmt.Sprintf("UserID: %v", userID))
+
+	if userID != nil {
+		// UserID is set and can be deleted
+		err := session.Delete("UserID")
+		if err != nil {
+			beego.Error(fmt.Sprintf("Не удалилась кука UserID: %v", err))
+
+			// Сообщение об ошибке в браузер
+			// Вывод сообщения об ошибке в модальном окне
+			controller.TplName = "message-modal.tpl"
+			controller.Data["title"] = "Ошибка"
+			controller.Data["message1"] = "Ошибка"
+			controller.Data["message2"] = "Ошибка разлогинивания - не удалилась кука UserID"
+			controller.Data["message3"] = err
+		} else {
+			controller.Redirect("/realty/login", http.StatusSeeOther)
+		}
 	}
 }

@@ -40,8 +40,8 @@
             <div class="navbar-item">
                 <div class="buttons">
 
-                    <a class="button is-dark" title="Выход">
-                        <strong>Выход</strong>
+                    <a class="navbar-item" title="Выход" href="/realty/logout">
+                        Выход
                     </a>
 
 

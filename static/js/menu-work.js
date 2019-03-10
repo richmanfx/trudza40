@@ -7,6 +7,7 @@
 
 $(document).ready(function() {
 
+
     // Если кликнули по пункту "О программе"
     $('#about-menu').on('click',function() {
         // alert('Ho-ho!');
@@ -14,6 +15,7 @@ $(document).ready(function() {
         // Сделать модальное окно активным - добавить "is-active"
         $(".about-modal").toggleClass("is-active");
     });
+
 
     $('#ok_button').on('click',function() {
 

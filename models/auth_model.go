@@ -52,7 +52,7 @@ func init() {
 }
 
 /* Проверить наличие пользователя в БД */
-func CheckUserInDB(login string) error {
+func CheckUserInDB(login string) (int, error) {
 	beego.Info("Работает функция 'CheckUserInDB'")
 
 	var err error
@@ -63,7 +63,13 @@ func CheckUserInDB(login string) error {
 	exist := o.QueryTable(user).Filter("login", login).Exist() // Существует ли в базе?
 
 	if exist {
-		beego.Info(fmt.Sprintf("Пользователь существует: %d / %s / %s", user.Id, user.Login, user.FullName))
+		beego.Info(fmt.Sprintf("Пользователь '%s' существует", user.Login))
+		// Получить ID пользователя из база
+		err := o.QueryTable("user").Filter("login", login).One(&user, "id") // Только ID интересует
+		if err != nil {
+			beego.Error("Ошибка при запросе получения из базы ID пользователя")
+		}
+		beego.Info(fmt.Sprintf("ID пользователя: %d", user.Id))
 	} else {
 		err = errors.New(fmt.Sprintf("Пользователь '%s' в БД не существует", login))
 	}
@@ -79,7 +85,7 @@ func CheckUserInDB(login string) error {
 	if err != nil {
 		beego.Error(fmt.Sprintf("Ошибка при проверке наличия пользователя '%s' в БД: '%v'", login, err))
 	}
-	return err
+	return user.Id, err
 }
 
 /* Вернуть имя БД, имя пользователя в БД и его пароль */

@@ -7,8 +7,9 @@ import (
 )
 
 var globalSessions *session.Manager
+var userSession session.Store
 
-/* Инициализировать мешаизм сессий */
+/* Инициализировать механизм сессий */
 func SessionInit() {
 
 	var (
@@ -17,7 +18,7 @@ func SessionInit() {
 		sessionProviderConfig session.ManagerConfig
 	)
 
-	sessionProviderConfig.CookieName = "gosessionid"
+	//sessionProviderConfig.CookieName = "begoosessionID"
 	sessionProviderConfig.Gclifetime = 3600
 
 	globalSessions, err = session.NewManager(providerName, &sessionProviderConfig)
@@ -31,18 +32,15 @@ func SessionInit() {
 /* Приверить наличие сессии */
 func CheckSession(controller *MainController) {
 
-	userSession := controller.GetSession("userSession")
-	if userSession == nil {
-		//controller.SetSession("userSession", int(1))
-		//controller.Data["sessid"] = 0
+	userSession = controller.StartSession()
+	userID := userSession.Get("UserID")
+	sid := userSession.SessionID()
 
-		// Если нет сессии, то редирект на страницу авторизации
-		//controller.Abort("303")
+	beego.Info(sid)
+
+	if userID == nil {
+		// Пользователь ранее не логинился
 		controller.Redirect("/realty/login", http.StatusSeeOther)
-
-	} else {
-		// Если сессия есть, то инкрементировать её номер
-		controller.SetSession("userSession", userSession.(int)+1)
-		controller.Data["sessid"] = userSession.(int)
 	}
+
 }
