@@ -34,9 +34,9 @@ func (context *ScrapController) TorgiGovRuScraping() {
 	}
 	defer webDriver.Quit()
 
-	err = webDriver.MaximizeWindow("")
+	err = webDriver.ResizeWindow("", 1920, 1080)
 	if err != nil {
-		beego.Error("Браузер не смог открыться на весь экран")
+		beego.Error("Браузер не смог выставить размер окна")
 	}
 
 	err = webDriver.Get("https://torgi.gov.ru/index.html")

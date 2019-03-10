@@ -17,7 +17,7 @@ import (
 )
 
 type User struct {
-	Id       int
+	Id       int    `orm:"pk"`
 	Login    string `orm:"size(255)"`
 	FullName string `orm:"size(255)"`
 	Password string `orm:"size(511)"`
