@@ -10,7 +10,14 @@ type ScrapController struct {
 	beego.Controller
 }
 
-/* Скрапинг сайта "torgi.gov.ru" */
+/* Настроить параметры для скрапинга сайта "torgi.gov.ru" */
+func (context *ScrapController) TorgiGovRuSettings() {
+	context.TplName = "settings-torgi-gov-ru.tpl"
+	context.Data["title"] = "Settings"
+
+}
+
+/* Скрапить сайт "torgi.gov.ru" */
 func (context *ScrapController) TorgiGovRuScraping() {
 	context.TplName = "scrap-result.tpl"
 	context.Data["title"] = "Scraping"

@@ -9,7 +9,7 @@ import (
 
 type TorgiGovRuSettings struct {
 	UserId        uint   `orm:"pk"`        // ID пользователя, первичный ключ
-	SettingsName  string `orm:"size(255)"` // Название настройки
+	SettingsName  string `orm:"size(255)"` // Название комплекта настроек
 	BrowserWidth  uint   // Ширина окна браузера
 	BrowserHeight uint   // Высота окна браузера
 	HostPageUrl   string `orm:"size(255)"` // URL страницы хоста для скрапинга
@@ -27,7 +27,7 @@ type TorgiGovRuSettings struct {
 	PropertyLocation string `orm:"size(100)"` // Местоположение имущества (город) (Zb: "Москва (г)")
 	SortFieldName    string `orm:"size(100)"` // Столбец, по которому сортировать ("Коэффициент доходности")
 
-	AverageRental        float32 // Средняя стоимость аренды, рублнй за кв.м. в месяц
+	AverageRental        float32 // Средняя стоимость аренды, рублей за кв.м. в месяц
 	ProfitMonths         uint    // Количество доходных месяцев в году
 	PriorRepair          float32 // Предварительный ремонт, рублей за кв.м.
 	ContractRegistration float32 // Стоимость регистрации договора, рублей
@@ -35,7 +35,7 @@ type TorgiGovRuSettings struct {
 	YearlyInsurance      float32 // Стоимость годовой страховки (рубли) в Альфа-Страховании,
 	// зависит от площади в метрах - до 100 кв.м = 4000 рублей
 	MonthlyHeating           float32 // Отопление, рублей за кв.м. в месяц
-	HousingOfficeMaintenance float32 // Обслуживание ЖЭКом в месяц
+	HousingOfficeMaintenance float32 // Обслуживание ЖЭКом, рублей за кв.м. в месяц
 	AccountingService        float32 // Бухгалтерское обслуживание, рублей в месяц
 	RequiredProfitMargin     uint    // Требуемый, приемлемый коэффициент доходности
 }
