@@ -6,7 +6,7 @@
             <span class="has-text-danger is-size-4 has-text-weight-bold">Изменение пароля пользователя</span>
             <hr>
 
-            <form id="id_change_password_form" method="post" action="/change-password">
+            <form id="id_change_password_form" method="post" action="/realty/change-password">
 
                 <label class="label is-medium" for="id_login_change"> Пользователь </label>
                 <input class="input is-medium is-primary" id="id_login_change" name="login" required>
@@ -18,7 +18,10 @@
                        name="new_password" type="password" required>
                 <br>
                 <br>
-                <input type="hidden" name="full_name">
+
+                <input type="hidden" id="id_id_change" name="id">
+                <input type="hidden" id="id_full_name_change" name="full_name">
+
             </form>
         </div>
 

@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/astaxie/beego"
+	"strconv"
 	"trudza40/models"
 )
 
@@ -120,6 +121,7 @@ func (context *ConfigController) ChangePassword() {
 	// Данные из формы
 	user.Login = context.GetString("login")
 	user.FullName = context.GetString("full_name")
+	user.Id, _ = strconv.Atoi(context.GetString("id"))
 	user.Password = context.GetString("new_password")
 
 	// Записать в БД новый пароль

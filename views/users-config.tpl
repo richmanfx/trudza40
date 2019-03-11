@@ -31,7 +31,10 @@
                                 <img src="/static/img/delete.png" alt="Delete user" width="20" height="20"/>
                             </a>
                             <a class="change-password" title="Изменить пароль"
-                               data-login="{{ $val.Login }}" data-name="{{ $val.FullName }}">
+                               data-login="{{ $val.Login }}"
+                               data-name="{{ $val.FullName }}"
+                               data-id="{{ $val.Id }}"
+                            >
                                 <img src="/static/img/password.png" alt="Change password" width="20" height="20"/>
                             </a>
                         </td>

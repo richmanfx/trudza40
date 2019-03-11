@@ -299,8 +299,7 @@ func SavePassword(user User) error {
 	// Занести новый хеш пароля и новую соль в БД
 	id, err :=
 		o.QueryTable("user").
-			Filter("login", user.Login).
-			Filter("full_name", user.FullName).
+			Filter("id", user.Id).
 			Update(orm.Params{"password": newHash, "salt": salt})
 	if err == nil {
 		beego.Info(fmt.Sprintf("Updated record ID: '%d'", id))

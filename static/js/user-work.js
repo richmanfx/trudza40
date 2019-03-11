@@ -31,13 +31,15 @@ $(document).ready(function() {
         $(".change-password-modal").toggleClass("is-active");
 
         // Извлечь информацию из "data-*" полей у кликнутого элемента
-        let Login = $(this).data('login');
-        let deletedFullName = $(this).data('name');
+        let login = $(this).data('login');
+        let id = $(this).data('id');
+        let fullName = $(this).data('name');
 
         // В input-ы вставить значения из "data-*"
         let modal_box = $('.box');
-        modal_box.find('#id_login_change').val(Login);
-        modal_box.find('#id_full_name').val(deletedFullName);
+        modal_box.find('#id_login_change').val(login);
+        modal_box.find('#id_id_change').val(id);
+        modal_box.find('#id_full_name_change').val(fullName);
 
     });
 
