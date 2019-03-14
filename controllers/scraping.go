@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/tebeka/selenium"
+	"trudza40/models"
 )
 
 type ScrapController struct {
@@ -14,6 +15,18 @@ type ScrapController struct {
 func (context *ScrapController) TorgiGovRuSettings() {
 	context.TplName = "settings-torgi-gov-ru.tpl"
 	context.Data["title"] = "Settings"
+
+	// Получить значения настроек из БД для залогиненного пользователя
+	if GlobalUserId == 0 {
+		beego.Error("Пользователь не авторизован, UserId = 0")
+	}
+	setting := models.GetTorgiGovRuSettings(GlobalUserId)
+	beego.Info(setting)
+
+}
+
+/* Сохранить настройки в БД */
+func (context *ScrapController) SaveSettings() {
 
 }
 

@@ -8,6 +8,9 @@ import (
 	"trudza40/models"
 )
 
+var GlobalUserId = 0
+var GlobalUserLogin string
+
 type AuthController struct {
 	beego.Controller
 }
@@ -26,6 +29,7 @@ func (controller *AuthController) LoginProcessing() {
 
 	// Проверить существование пользователя в базе
 	userId, err = models.CheckUserInDB(userName)
+	GlobalUserId = userId
 
 	// Проверить пароль по Хешу из БД
 	if err == nil {
@@ -36,8 +40,8 @@ func (controller *AuthController) LoginProcessing() {
 	if err == nil {
 		beego.Info(fmt.Sprintf("Пользователь '%s' вошёл в приложение.", userName))
 
-		// Логин пользователя в заголовок
-		//helpers.UserLogin = userName		// TODO: Пока не реализовано
+		// Логин пользователя для заголовка
+		GlobalUserLogin = userName // TODO: Пока заголовок не реализован
 
 		// Добавить куку с ID полльзователя
 		err = userSession.Set("UserID", userId)

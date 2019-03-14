@@ -28,8 +28,8 @@ func init() {
 
 	baseName, baseUserName, baseUserPassword := getDbAccount()
 
-	// Регистрация модели
-	orm.RegisterModel(new(User))
+	// Регистрация ВЕХ моделей !!!
+	orm.RegisterModel(new(User), new(Settings))
 
 	// Регистрация драйвера БД
 	err := orm.RegisterDriver("postgres", orm.DRPostgres)
@@ -64,7 +64,7 @@ func CheckUserInDB(login string) (int, error) {
 
 	if exist {
 		beego.Info(fmt.Sprintf("Пользователь '%s' существует", user.Login))
-		// Получить ID пользователя из база
+		// Получить ID пользователя из базы
 		err := o.QueryTable("user").Filter("login", login).One(&user, "id") // Только ID интересует
 		if err != nil {
 			beego.Error("Ошибка при запросе получения из базы ID пользователя")

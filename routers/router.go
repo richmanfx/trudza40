@@ -20,6 +20,7 @@ func init() {
 	beego.Router("/realty/change-password", &controllers.ConfigController{}, "post:ChangePassword")
 
 	beego.Router("/realty/settings_torgi_gov_ru", &controllers.ScrapController{}, "get:TorgiGovRuSettings")
+	beego.Router("/realty/save-settings", &controllers.ScrapController{}, "post:SaveSettings")
 	beego.Router("/realty/scraping_torgi_gov_ru", &controllers.ScrapController{}, "get:TorgiGovRuScraping")
 
 }

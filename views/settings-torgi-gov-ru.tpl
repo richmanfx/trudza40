@@ -5,6 +5,7 @@
     <div class="column ">
         <div class="content">
             <div class="field boxes">
+            <form method="post" class="" action="/realty/save-settings">
 
                 <label class="label">Название комплекта настроек</label>
                 <div class="control">
@@ -161,6 +162,14 @@
                 </div>
                 <br>
 
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-success" type="submit">
+                            Сохранить настройки
+                        </button>
+                    </div>
+                </div>
+            </form>
             </div>
         </div>
     </div>
