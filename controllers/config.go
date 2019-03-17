@@ -12,49 +12,49 @@ type ConfigController struct {
 }
 
 /* Редактирование основной конфигурации */
-func (context *ConfigController) EditConfig() {
-	context.TplName = "config.tpl"
-	context.Data["title"] = "Realty Config"
+func (controller *ConfigController) EditConfig() {
+	controller.TplName = "config.tpl"
+	controller.Data["title"] = "Realty Config"
 }
 
 /* Конфигурирование пользователей */
-func (context *ConfigController) UsersConfig() {
+func (controller *ConfigController) UsersConfig() {
 
 	// Считать из БД пользователей
 	users, err := models.GetUsers()
 	beego.Info(fmt.Sprintf("Пользователи из БД: '%v'", users))
 
 	if err == nil {
-		context.TplName = "users-config.tpl"
-		context.Data["title"] = "Users Config"
-		context.Data["users"] = users
+		controller.TplName = "users-config.tpl"
+		controller.Data["title"] = "Users Config"
+		controller.Data["users"] = users
 	} else {
 		beego.Error("Ошибка при получении данных о пользователях из БД")
 		// Вывод сообщения об ошибке в модальном окне
-		context.TplName = "message-modal.tpl"
-		context.Data["title"] = "Ошибка"
-		context.Data["message1"] = "Ошибка"
-		context.Data["message2"] = "Ошибка при получении данных о пользователях из БД"
-		context.Data["message3"] = err
+		controller.TplName = "message-modal.tpl"
+		controller.Data["title"] = "Ошибка"
+		controller.Data["message1"] = "Ошибка"
+		controller.Data["message2"] = "Ошибка при получении данных о пользователях из БД"
+		controller.Data["message3"] = err
 	}
 }
 
 /* Ввести данные нового пользователя в модальной форме */
-func (context *ConfigController) CreateUser() {
-	context.TplName = "create-user-modal.tpl"
-	context.Data["title"] = "Create User"
+func (controller *ConfigController) CreateUser() {
+	controller.TplName = "create-user-modal.tpl"
+	controller.Data["title"] = "Create User"
 }
 
 /* Создать нового пользователя в БД */
-func (context *ConfigController) CreateUserInDb() {
+func (controller *ConfigController) CreateUserInDb() {
 
 	// Пользователь
 	user := new(models.User)
 
 	// Данные из формы
-	user.Login = context.GetString("login")
-	user.FullName = context.GetString("full_name")
-	openPassword := context.GetString("password")
+	user.Login = controller.GetString("login")
+	user.FullName = controller.GetString("full_name")
+	openPassword := controller.GetString("password")
 
 	// Получить Соль и Хеш пароля
 	user.Salt = models.CreateSalt()
@@ -65,64 +65,64 @@ func (context *ConfigController) CreateUserInDb() {
 	if err == nil {
 		beego.Info("Пользователь удачно создан")
 		// Вывод сообщения об удачном создании пользователя
-		context.TplName = "message-modal.tpl"
-		context.Data["title"] = "Info"
-		context.Data["message1"] = "Информация"
-		context.Data["message2"] = fmt.Sprintf("Пользователь '%s' удачно создан", user.Login)
+		controller.TplName = "message-modal.tpl"
+		controller.Data["title"] = "Info"
+		controller.Data["message1"] = "Информация"
+		controller.Data["message2"] = fmt.Sprintf("Пользователь '%s' удачно создан", user.Login)
 
 	} else {
 		beego.Error("Создать пользователя не удалось")
 		// Вывод сообщения об ошибке в модальном окне
-		context.TplName = "message-modal.tpl"
-		context.Data["title"] = "Ошибка"
-		context.Data["message1"] = "Ошибка"
-		context.Data["message2"] = "Создать пользователя не удалось"
-		context.Data["message3"] = err
+		controller.TplName = "message-modal.tpl"
+		controller.Data["title"] = "Ошибка"
+		controller.Data["message1"] = "Ошибка"
+		controller.Data["message2"] = "Создать пользователя не удалось"
+		controller.Data["message3"] = err
 	}
 }
 
 /* Удалить пользователя */
-func (context *ConfigController) DeleteUser() {
+func (controller *ConfigController) DeleteUser() {
 
 	// Пользователь
 	user := new(models.User)
 
 	// Данные из формы
-	user.Login = context.GetString("login")
-	user.FullName = context.GetString("full_name")
+	user.Login = controller.GetString("login")
+	user.FullName = controller.GetString("full_name")
 
 	err := models.DeleteUserInDb(*user)
 
 	if err == nil {
 		beego.Info("Пользователь удачно удалён")
 
-		context.TplName = "message-modal.tpl"
-		context.Data["title"] = "Info"
-		context.Data["message1"] = "Информация"
-		context.Data["message2"] = fmt.Sprintf("Пользователь '%s' удачно удалён", user.Login)
+		controller.TplName = "message-modal.tpl"
+		controller.Data["title"] = "Info"
+		controller.Data["message1"] = "Информация"
+		controller.Data["message2"] = fmt.Sprintf("Пользователь '%s' удачно удалён", user.Login)
 
 	} else {
 		beego.Error("Удалить пользователя не удалось")
 
-		context.TplName = "message-modal.tpl"
-		context.Data["title"] = "Ошибка"
-		context.Data["message1"] = "Ошибка"
-		context.Data["message2"] = "Удалить пользователя не удалось"
-		context.Data["message3"] = err
+		controller.TplName = "message-modal.tpl"
+		controller.Data["title"] = "Ошибка"
+		controller.Data["message1"] = "Ошибка"
+		controller.Data["message2"] = "Удалить пользователя не удалось"
+		controller.Data["message3"] = err
 	}
 }
 
 /* Изменить пароль пользователя */
-func (context *ConfigController) ChangePassword() {
+func (controller *ConfigController) ChangePassword() {
 
 	// Пользователь
 	user := new(models.User)
 
 	// Данные из формы
-	user.Login = context.GetString("login")
-	user.FullName = context.GetString("full_name")
-	user.Id, _ = strconv.Atoi(context.GetString("id"))
-	user.Password = context.GetString("new_password")
+	user.Login = controller.GetString("login")
+	user.FullName = controller.GetString("full_name")
+	user.Id, _ = strconv.Atoi(controller.GetString("id"))
+	user.Password = controller.GetString("new_password")
 
 	// Записать в БД новый пароль
 	err := models.SavePassword(*user)
@@ -130,19 +130,19 @@ func (context *ConfigController) ChangePassword() {
 	if err == nil {
 		beego.Info("Пароль пользователя удачно изменён")
 		// Вывод сообщения об удачном создании пользователя
-		context.TplName = "message-modal.tpl"
-		context.Data["title"] = "Info"
-		context.Data["message1"] = "Информация"
-		context.Data["message2"] = fmt.Sprintf("Пароль пользователя '%s' удачно изменён", user.Login)
+		controller.TplName = "message-modal.tpl"
+		controller.Data["title"] = "Info"
+		controller.Data["message1"] = "Информация"
+		controller.Data["message2"] = fmt.Sprintf("Пароль пользователя '%s' удачно изменён", user.Login)
 
 	} else {
 		beego.Error("Изменить пароль пользователя не удалось")
 		// Вывод сообщения об ошибке в модальном окне
-		context.TplName = "message-modal.tpl"
-		context.Data["title"] = "Ошибка"
-		context.Data["message1"] = "Ошибка"
-		context.Data["message2"] = "Изменить пароль пользователя не удалось"
-		context.Data["message3"] = err
+		controller.TplName = "message-modal.tpl"
+		controller.Data["title"] = "Ошибка"
+		controller.Data["message1"] = "Ошибка"
+		controller.Data["message2"] = "Изменить пароль пользователя не удалось"
+		controller.Data["message3"] = err
 	}
 
 }
