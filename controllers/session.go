@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/session"
 	"net/http"
@@ -36,10 +37,11 @@ func CheckSession(controller *MainController) {
 	userID := userSession.Get("UserID")
 	sid := userSession.SessionID()
 
-	beego.Info(sid)
+	beego.Info(fmt.Sprintf("В функции 'CheckSession' sid='%v' и userId='%v'", sid, userID))
 
 	if userID == nil {
 		// Пользователь ранее не логинился
+		beego.Debug("Пользователь ранее не логинился")
 		controller.Redirect("/realty/login", http.StatusSeeOther)
 	}
 

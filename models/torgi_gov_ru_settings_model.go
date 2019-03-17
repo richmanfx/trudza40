@@ -110,8 +110,6 @@ func SettingsFill(settings *Settings, params []orm.Params) {
 		browserHeight, _ := strconv.Atoi(fmt.Sprintf("%v", m["BrowserHeight"]))
 		settings.BrowserHeight = uint(browserHeight)
 
-		settings.DebugLevel = fmt.Sprintf("%v", m["DebugLevel"])
-
 		settings.HostPageUrl = fmt.Sprintf("%v", m["HostPageUrl"])
 
 		flashQuantity, _ := strconv.Atoi(fmt.Sprintf("%v", m["FlashQuantity"]))
@@ -121,6 +119,8 @@ func SettingsFill(settings *Settings, params []orm.Params) {
 		settings.FlashPeriod = uint(flashPeriod)
 
 		settings.FlashAllowed, _ = strconv.ParseBool(fmt.Sprintf("%v", m["FlashAllowed"]))
+
+		settings.DebugLevel = fmt.Sprintf("%v", m["DebugLevel"])
 
 		minArea, _ := strconv.Atoi(fmt.Sprintf("%v", m["MinArea"]))
 		settings.MinArea = uint(minArea)
@@ -147,7 +147,30 @@ func SettingsFill(settings *Settings, params []orm.Params) {
 		profitMonths, _ := strconv.Atoi(fmt.Sprintf("%v", m["ProfitMonths"]))
 		settings.ProfitMonths = uint(profitMonths)
 
+		priorRepair, _ := strconv.Atoi(fmt.Sprintf("%v", m["PriorRepair"]))
+		settings.PriorRepair = uint(priorRepair)
+
+		contractRegistration, _ := strconv.Atoi(fmt.Sprintf("%v", m["ContractRegistration"]))
+		settings.ContractRegistration = uint(contractRegistration)
+
+		runningCost, _ := strconv.Atoi(fmt.Sprintf("%v", m["RunningCost"]))
+		settings.RunningCost = uint(runningCost)
+
+		yearlyInsurance, _ := strconv.Atoi(fmt.Sprintf("%v", m["YearlyInsurance"]))
+		settings.YearlyInsurance = uint(yearlyInsurance)
+
+		monthlyHeating, _ := strconv.Atoi(fmt.Sprintf("%v", m["MonthlyHeating"]))
+		settings.MonthlyHeating = uint(monthlyHeating)
+
+		housingOfficeMaintenance, _ := strconv.Atoi(fmt.Sprintf("%v", m["HousingOfficeMaintenance"]))
+		settings.HousingOfficeMaintenance = uint(housingOfficeMaintenance)
+
+		accountingService, _ := strconv.Atoi(fmt.Sprintf("%v", m["AccountingService"]))
+		settings.AccountingService = uint(accountingService)
+
+		requiredProfitMargin, _ := strconv.Atoi(fmt.Sprintf("%v", m["RequiredProfitMargin"]))
+		settings.RequiredProfitMargin = uint(requiredProfitMargin)
 	}
 
-	print()
+	beego.Info(fmt.Sprintf("Настройки: '%v'", settings))
 }

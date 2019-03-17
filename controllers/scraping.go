@@ -20,9 +20,10 @@ func (context *ScrapController) TorgiGovRuSettings() {
 	if GlobalUserId == 0 {
 		beego.Error("Пользователь не авторизован, UserId = 0")
 	}
-	setting := models.GetTorgiGovRuSettings(GlobalUserId)
-	beego.Info(setting)
+	settings := models.GetTorgiGovRuSettings(GlobalUserId)
 
+	// Вывести параметры из настроек на форму с настройками
+	context.Data["settings"] = settings
 }
 
 /* Сохранить настройки в БД */

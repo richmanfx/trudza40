@@ -99,7 +99,7 @@ func getDbAccount() (baseName, baseUserName, baseUserPassword string) {
 
 	// Полное имя файла аккаунтов
 	fullAccountFileName := accountDirName + "/" + accountFileName
-	beego.Info(fmt.Sprintf("Full config file name: '%s'", fullAccountFileName))
+	beego.Debug(fmt.Sprintf("Full config file name: '%s'", fullAccountFileName))
 
 	// Чтение параметров из файла аккаунтов
 	getConfigParameters(fullAccountFileName, &baseName, &baseUserName, &baseUserPassword)
@@ -116,7 +116,7 @@ func getConfigParameters(fullConfigFileName string, baseName, baseUserName, base
 	}
 
 	*baseName = config.Section("").Key("DATABASENAME").String()
-	beego.Info(fmt.Sprintf("Используемая база данных: '%s'", *baseName))
+	beego.Debug(fmt.Sprintf("Используемая база данных: '%s'", *baseName))
 
 	*baseUserName = config.Section("").Key("BASEUSERNAME").String()
 	*baseUserPassword = config.Section("").Key("BASEUSERPASSWORD").String()
@@ -127,7 +127,7 @@ func CheckPasswordInDB(login, password string) error {
 
 	// Получить Соль из БД
 	salt, err := GetSaltFromDb(login)
-	beego.Info(fmt.Sprintf("Соль из БД: '%s'", salt))
+	beego.Debug(fmt.Sprintf("Соль из БД: '%s'", salt))
 
 	if err == nil {
 

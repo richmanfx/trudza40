@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"errors"
 	"fmt"
 	"github.com/astaxie/beego"
 	"net/http"
+	"time"
 	"trudza40/models"
 )
 
@@ -22,40 +22,40 @@ func (controller *AuthController) Login() {
 
 func (controller *AuthController) LoginProcessing() {
 
-	err := errors.New(fmt.Sprintln("err: 'Ошибка'"))
+	//err := errors.New(fmt.Sprintln("err: 'Ошибка'"))
+	var err error
 	userName := controller.GetString("user_name")
 	userPassword := controller.GetString("user_password")
-	var userId int
 
 	// Проверить существование пользователя в базе
-	userId, err = models.CheckUserInDB(userName)
-	GlobalUserId = userId
+	GlobalUserId, err = models.CheckUserInDB(userName)
 
 	// Проверить пароль по Хешу из БД
 	if err == nil {
 		// Можно закомментировать для возможности залогиниться без Хешей из БД
 		err = models.CheckPasswordInDB(userName, userPassword)
-	}
 
-	if err == nil {
 		beego.Info(fmt.Sprintf("Пользователь '%s' вошёл в приложение.", userName))
 
 		// Логин пользователя для заголовка
 		GlobalUserLogin = userName // TODO: Пока заголовок не реализован
 
-		// Добавить куку с ID полльзователя
-		err = userSession.Set("UserID", userId)
-		if err != nil {
-			beego.Error("Не добавился UserID")
-		}
+		//// Добавить куку с ID пользователя
+		err = userSession.Set("UserID", GlobalUserId)
+		time.Sleep(1 * time.Second)
+		//if err != nil {
+		//	beego.Error("Не добавился UserID")
+		//}
 
 		// Новая сессия с новой кукой
 		userID := controller.StartSession().Get("UserID") // Новая сессия
-		beego.Info(fmt.Sprintf("UserID: %v", userID))
+
+		beego.Info(fmt.Sprintf("UserID: %v", GlobalUserId))
 		if userID == nil {
 			return
 		}
 
+		beego.Info("Редирект на '/realty'")
 		controller.Redirect("/realty", http.StatusSeeOther)
 
 	} else {
