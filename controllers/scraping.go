@@ -3,7 +3,9 @@ package controllers
 import (
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 	"github.com/tebeka/selenium"
+	"strconv"
 	"trudza40/models"
 )
 
@@ -12,9 +14,9 @@ type ScrapController struct {
 }
 
 /* Настроить параметры для скрапинга сайта "torgi.gov.ru" */
-func (context *ScrapController) TorgiGovRuSettings() {
-	context.TplName = "settings-torgi-gov-ru.tpl"
-	context.Data["title"] = "Settings"
+func (controller *ScrapController) TorgiGovRuSettings() {
+	controller.TplName = "settings-torgi-gov-ru.tpl"
+	controller.Data["title"] = "Settings"
 
 	// Получить значения настроек из БД для залогиненного пользователя
 	if GlobalUserId == 0 {
@@ -23,22 +25,140 @@ func (context *ScrapController) TorgiGovRuSettings() {
 	settings := models.GetTorgiGovRuSettings(GlobalUserId)
 
 	// Вывести параметры из настроек на форму с настройками
-	context.Data["settings"] = settings
+	controller.Data["settings"] = settings
 }
 
 /* Сохранить настройки в БД */
-func (context *ScrapController) SaveSettings() {
+func (controller *ScrapController) SaveSettings() {
 
+	var settings models.Settings
+
+	// Данные из формы
+	settings.SettingsName = controller.GetString("settings_name")
+
+	browserWidth, _ := strconv.Atoi(controller.GetString("browser_width"))
+	settings.BrowserWidth = uint(browserWidth)
+
+	browserHeight, _ := strconv.Atoi(controller.GetString("browser_height"))
+	settings.BrowserHeight = uint(browserHeight)
+
+	settings.HostPageUrl = controller.GetString("host_page_url")
+
+	flashAllowed := controller.GetString("flash_allowed")
+	if flashAllowed == "on" {
+		settings.FlashAllowed = true
+	} else {
+		settings.FlashAllowed = false
+	}
+
+	flashQuantity, _ := strconv.Atoi(controller.GetString("flash_quantity"))
+	settings.FlashQuantity = uint(flashQuantity)
+
+	flashPeriod, _ := strconv.Atoi(controller.GetString("flash_period"))
+	settings.FlashPeriod = uint(flashPeriod)
+
+	settings.DebugLevel = controller.GetString("debug_level")
+
+	minArea, _ := strconv.Atoi(controller.GetString("min_area"))
+	settings.MinArea = uint(minArea)
+
+	maxArea, _ := strconv.Atoi(controller.GetString("max_area"))
+	settings.MaxArea = uint(maxArea)
+
+	minRentalPeriod, _ := strconv.Atoi(controller.GetString("min_rental_period"))
+	settings.MinRentalPeriod = uint(minRentalPeriod)
+
+	settings.PropertyType = controller.GetString("property_type")
+	settings.ContractType = controller.GetString("contract_type")
+	settings.Country = controller.GetString("country")
+	settings.PropertyLocation = controller.GetString("property_location")
+	settings.SortFieldName = controller.GetString("sort_field_name")
+
+	averageRental, _ := strconv.Atoi(controller.GetString("average_rental"))
+	settings.AverageRental = uint(averageRental)
+
+	profitMonths, _ := strconv.Atoi(controller.GetString("profit_months"))
+	settings.ProfitMonths = uint(profitMonths)
+
+	priorRepair, _ := strconv.Atoi(controller.GetString("prior_repair"))
+	settings.PriorRepair = uint(priorRepair)
+
+	contractRegistration, _ := strconv.Atoi(controller.GetString("contract_registration"))
+	settings.ContractRegistration = uint(contractRegistration)
+
+	runningCost, _ := strconv.Atoi(controller.GetString("running_cost"))
+	settings.RunningCost = uint(runningCost)
+
+	yearlyInsurance, _ := strconv.Atoi(controller.GetString("yearly_insurance"))
+	settings.YearlyInsurance = uint(yearlyInsurance)
+
+	monthlyHeating, _ := strconv.Atoi(controller.GetString("monthly_heating"))
+	settings.MonthlyHeating = uint(monthlyHeating)
+
+	housingOfficeMaintenance, _ := strconv.Atoi(controller.GetString("housing_office_maintenance"))
+	settings.HousingOfficeMaintenance = uint(housingOfficeMaintenance)
+
+	accountingService, _ := strconv.Atoi(controller.GetString("accounting_service"))
+	settings.AccountingService = uint(accountingService)
+
+	requiredProfitMargin, _ := strconv.Atoi(controller.GetString("required_profit_margin"))
+	settings.RequiredProfitMargin = uint(requiredProfitMargin)
+
+	o := orm.NewOrm() // Использовать ORM "Ormer"
+	orm.Debug = true  // Логирование ORM запросов
+
+	num, err := o.QueryTable("settings").Filter("user_id", GlobalUserId).Update(orm.Params{
+		"user_id":                    GlobalUserId,
+		"settings_name":              settings.SettingsName,
+		"browser_width":              settings.BrowserWidth,
+		"browser_height":             settings.BrowserHeight,
+		"host_page_url":              settings.HostPageUrl,
+		"flash_allowed":              settings.FlashAllowed,
+		"flash_quantity":             settings.FlashQuantity,
+		"flash_period":               settings.FlashPeriod,
+		"debug_level":                settings.DebugLevel,
+		"min_area":                   settings.MinArea,
+		"max_area":                   settings.MaxArea,
+		"min_rental_period":          settings.MinRentalPeriod,
+		"property_type":              settings.PropertyType,
+		"contract_type":              settings.ContractType,
+		"country":                    settings.Country,
+		"property_location":          settings.PropertyLocation,
+		"sort_field_name":            settings.SortFieldName,
+		"average_rental":             settings.AverageRental,
+		"profit_months":              settings.ProfitMonths,
+		"prior_repair":               settings.PriorRepair,
+		"contract_registration":      settings.ContractRegistration,
+		"running_cost":               settings.RunningCost,
+		"yearly_insurance":           settings.YearlyInsurance,
+		"monthly_heating":            settings.MonthlyHeating,
+		"housing_office_maintenance": settings.HousingOfficeMaintenance,
+		"accounting_service":         settings.AccountingService,
+		"required_profit_margin":     settings.RequiredProfitMargin,
+	})
+	if err == nil {
+		beego.Info(fmt.Sprintf("Настройки сохранены в БД, записей '%d'", num))
+		controller.TplName = "message-modal.tpl"
+		controller.Data["title"] = "Info"
+		controller.Data["message1"] = "Информация"
+		controller.Data["message2"] = "Настройки сохранены в БД"
+	} else {
+		beego.Error(fmt.Sprintf("Не удалилось сохранить настройки в БД: %v", err))
+		controller.TplName = "message-modal.tpl"
+		controller.Data["title"] = "Ошибка"
+		controller.Data["message1"] = "Ошибка"
+		controller.Data["message2"] = "Не удалилось сохранить настройки в БД"
+		controller.Data["message3"] = err
+	}
 }
 
 /* Скрапить сайт "torgi.gov.ru" */
-func (context *ScrapController) TorgiGovRuScraping() {
-	context.TplName = "scrap-result.tpl"
-	context.Data["title"] = "Scraping"
+func (controller *ScrapController) TorgiGovRuScraping() {
+	controller.TplName = "scrap-result.tpl"
+	controller.Data["title"] = "Scraping"
 
 	// Считать данные для скрапинга
-	// TODO: Считываться будет из сохранённых пользователем данных в БД
-	// TODO: Временно захардкожено
+	settings := models.GetTorgiGovRuSettings(GlobalUserId)
 
 	var webDriver selenium.WebDriver
 	var capabilities = make(selenium.Capabilities, 1)
@@ -55,12 +175,12 @@ func (context *ScrapController) TorgiGovRuScraping() {
 	}
 	defer webDriver.Quit()
 
-	err = webDriver.ResizeWindow("", 1920, 1080)
+	err = webDriver.ResizeWindow("", int(settings.BrowserWidth), int(settings.BrowserHeight))
 	if err != nil {
 		beego.Error("Браузер не смог выставить размер окна")
 	}
 
-	err = webDriver.Get("https://torgi.gov.ru/index.html")
+	err = webDriver.Get(settings.HostPageUrl)
 	if err != nil {
 		panic(err)
 	}
