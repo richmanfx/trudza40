@@ -7,6 +7,7 @@ import (
 	"github.com/tebeka/selenium"
 	"strconv"
 	"trudza40/models"
+	"trudza40/pageobjects"
 )
 
 type ScrapController struct {
@@ -167,26 +168,52 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 	var err error
 
 	capabilities["browserName"] = browser
-	//capabilities["phantomjs.binary.path"] = "/usr/local/bin/phantomjs"
 
+	// Удалённый ВебДрайвер
 	webDriver, err = selenium.NewRemote(capabilities, fmt.Sprintf("http://localhost:%d/wd/hub", remoteDriverPort))
 	if err != nil {
 		panic(err)
 	}
 	defer webDriver.Quit()
 
+	// Выставить размеры окна браузера
 	err = webDriver.ResizeWindow("", int(settings.BrowserWidth), int(settings.BrowserHeight))
 	if err != nil {
 		beego.Error("Браузер не смог выставить размер окна")
 	}
 
+	// Открыть страницу
 	err = webDriver.Get(settings.HostPageUrl)
 	if err != nil {
 		panic(err)
 	}
 
-	title, _ := webDriver.Title()
+	// Выставить фильтры поиска
+	TestSetSearchFilters(webDriver)
 
-	beego.Info(fmt.Sprintf("Title: %s", title))
+}
+
+/* Выставить фильтры поиска */
+func TestSetSearchFilters(webDriver selenium.WebDriver) {
+
+	// Войти в расширенный поиск
+	pageobjects.ComeInExtSearch(webDriver)
+
+	// Указать тип имущества
+	pageobjects.SetAuctionType(webDriver)
+
+	// Указать вид договора
+
+	// Указать страну
+
+	// Указать местоположение имущества
+
+	// Указать диапазон площади объекта
+
+	// Указать минимальный срок аренды
+
+	// Искать
+
+	// Дождаться отображения объектов
 
 }
