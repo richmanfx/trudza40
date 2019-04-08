@@ -14,6 +14,8 @@ type ScrapController struct {
 	beego.Controller
 }
 
+var settings *models.Settings
+
 /* Настроить параметры для скрапинга сайта "torgi.gov.ru" */
 func (controller *ScrapController) TorgiGovRuSettings() {
 	controller.TplName = "settings-torgi-gov-ru.tpl"
@@ -23,7 +25,7 @@ func (controller *ScrapController) TorgiGovRuSettings() {
 	if GlobalUserId == 0 {
 		beego.Error("Пользователь не авторизован, UserId = 0")
 	}
-	settings := models.GetTorgiGovRuSettings(GlobalUserId)
+	settings = models.GetTorgiGovRuSettings(GlobalUserId)
 
 	// Вывести параметры из настроек на форму с настройками
 	controller.Data["settings"] = settings
@@ -32,7 +34,7 @@ func (controller *ScrapController) TorgiGovRuSettings() {
 /* Сохранить настройки в БД */
 func (controller *ScrapController) SaveSettings() {
 
-	var settings models.Settings
+	//var settings models.Settings
 
 	// Данные из формы
 	settings.SettingsName = controller.GetString("settings_name")
@@ -159,7 +161,7 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 	controller.Data["title"] = "Scraping"
 
 	// Считать данные для скрапинга
-	settings := models.GetTorgiGovRuSettings(GlobalUserId)
+	settings = models.GetTorgiGovRuSettings(GlobalUserId)
 
 	var webDriver selenium.WebDriver
 	var capabilities = make(selenium.Capabilities, 1)
@@ -199,10 +201,14 @@ func TestSetSearchFilters(webDriver selenium.WebDriver) {
 	// Войти в расширенный поиск
 	pageobjects.ComeInExtSearch(webDriver)
 
+	// Выбрать тип торгов
+	pageobjects.SetTradesType(webDriver)
+
 	// Указать тип имущества
-	pageobjects.SetAuctionType(webDriver)
+	pageobjects.SetAuctionType(webDriver, settings)
 
 	// Указать вид договора
+	pageobjects.SetContractType(webDriver)
 
 	// Указать страну
 

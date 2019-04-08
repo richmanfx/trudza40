@@ -43,15 +43,17 @@ func (controller *AuthController) LoginProcessing() {
 		//// Добавить куку с ID пользователя
 		err = userSession.Set("UserID", GlobalUserId)
 		time.Sleep(1 * time.Second)
-		//if err != nil {
-		//	beego.Error("Не добавился UserID")
-		//}
+		if err != nil {
+			beego.Error("Не добавился UserID")
+		}
+		beego.Info("Добавлен UserID")
 
 		// Новая сессия с новой кукой
 		userID := controller.StartSession().Get("UserID") // Новая сессия
 
 		beego.Info(fmt.Sprintf("UserID: %v", GlobalUserId))
 		if userID == nil {
+			beego.Info("userID = nil!")
 			return
 		}
 
