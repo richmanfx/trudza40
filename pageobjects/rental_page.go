@@ -116,9 +116,7 @@ func SetAuctionType(webDriver selenium.WebDriver, settings *models.Settings) {
 
 }
 
-///* Указать вид договора */
-//func SetContractType(webDriver selenium.WebDriver) {
-//
-//
-//
-//}
+/* Указать вид договора */
+func SetContractType(webDriver selenium.WebDriver) {
+
+}
