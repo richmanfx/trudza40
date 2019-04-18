@@ -34,7 +34,7 @@ func ComeInExtSearch(webDriver selenium.WebDriver) {
 	}
 
 	beego.Info("Кликнута " + msg)
-	time.Sleep(3 * time.Second)
+	time.Sleep(2 * time.Second)
 }
 
 /* Выбрать тип торгов */
@@ -56,7 +56,7 @@ func SetTradesType(webDriver selenium.WebDriver) {
 	}
 
 	beego.Info("Кликнута " + msg)
-	time.Sleep(3 * time.Second)
+	time.Sleep(2 * time.Second)
 
 }
 
@@ -64,9 +64,9 @@ func SetTradesType(webDriver selenium.WebDriver) {
 func SetAuctionType(webDriver selenium.WebDriver, settings *models.Settings) {
 
 	// Кнопка с картинкой книги
-	contractTypeImgXpath :=
+	propertyTypeImgXpath :=
 		"//td/label[text()='Тип имущества:']/../following-sibling::td[1]//table//tr/td/a[@title='Выбрать']/img"
-	imgButton, err := webDriver.FindElement(selenium.ByXPATH, contractTypeImgXpath)
+	imgButton, err := webDriver.FindElement(selenium.ByXPATH, propertyTypeImgXpath)
 
 	msg := "кнопка с изображением 'Тип имущества'"
 	if err != nil {
@@ -81,7 +81,7 @@ func SetAuctionType(webDriver selenium.WebDriver, settings *models.Settings) {
 	}
 
 	beego.Info("Кликнута " + msg)
-	time.Sleep(1 * time.Second)
+	time.Sleep(2 * time.Second)
 
 	// Чекбокс
 	checkBoxXpath := fmt.Sprintf("//td/span[text()='%s']/preceding-sibling::input", settings.PropertyType)
@@ -100,7 +100,7 @@ func SetAuctionType(webDriver selenium.WebDriver, settings *models.Settings) {
 	}
 
 	beego.Info("Выбран чекбокс " + settings.PropertyType)
-	//time.Sleep(3 * time.Second)
+	time.Sleep(2 * time.Second)
 
 	// Кнопка "Выбрать"
 	buttonXpath := "//ins[text()='Выбрать']"
@@ -119,11 +119,109 @@ func SetAuctionType(webDriver selenium.WebDriver, settings *models.Settings) {
 	}
 
 	beego.Info("Кликнута " + msg)
-	time.Sleep(15 * time.Second)
+	time.Sleep(2 * time.Second)
 
 }
 
 /* Указать вид договора */
-func SetContractType(webDriver selenium.WebDriver) {
+func SetContractType(webDriver selenium.WebDriver, settings *models.Settings) {
 
+	contractTypeImgXpath := "//td/label[text()='Вид договора:']/../" +
+		"following-sibling::td[1]//table//tr/td/a[@title='Выбрать']/img"
+
+	imgButton, err := webDriver.FindElement(selenium.ByXPATH, contractTypeImgXpath)
+
+	msg := "кнопка с изображением 'Вид договора'"
+	if err != nil {
+		beego.Error("Не нашлась " + msg)
+		panic(err)
+	}
+
+	err = imgButton.Click()
+	if err != nil {
+		beego.Error("Не кликнулась " + msg)
+		panic(err)
+	}
+
+	beego.Info("Кликнута " + msg)
+	time.Sleep(2 * time.Second)
+
+	// Чекбокс
+	checkBoxXpath := fmt.Sprintf("//td/span[text()='%s']/preceding-sibling::input", settings.ContractType)
+	checkBoxElement, err := webDriver.FindElement(selenium.ByXPATH, checkBoxXpath)
+
+	if err != nil {
+		beego.Error(fmt.Sprintf("Не нашёлся чекбокс '%s'", settings.ContractType))
+		panic(err)
+	}
+
+	err = checkBoxElement.Click()
+
+	if err != nil {
+		beego.Error(fmt.Sprintf("Не кликнулся чекбокс '%s' ", settings.ContractType))
+		panic(err)
+	}
+
+	beego.Info("Выбран чекбокс " + settings.ContractType)
+	time.Sleep(2 * time.Second)
+
+	// Кнопка "Выбрать"
+	buttonXpath := "//ins[text()='Выбрать']"
+	buttonElement, err := webDriver.FindElement(selenium.ByXPATH, buttonXpath)
+
+	msg = "кнопка 'Выбрать'"
+	if err != nil {
+		beego.Error("Не нашлась " + msg)
+		panic(err)
+	}
+
+	err = buttonElement.Click()
+	if err != nil {
+		beego.Error("Не кликнулась " + msg)
+		panic(err)
+	}
+
+	beego.Info("Кликнута " + msg)
+	time.Sleep(2 * time.Second)
+
+}
+
+// Указать страну
+func SetCountry(webDriver selenium.WebDriver) {
+
+	labelSelectCountryXpath := "//label[text()='Страна размещения:']"
+	selectCountryXpath := "//option[@title='РОССИЯ']"
+
+	labelSelectCountryElement, err := webDriver.FindElement(selenium.ByXPATH, labelSelectCountryXpath)
+	msg := "селектор выбора страны"
+	if err != nil {
+		beego.Error("Не нашёлся " + msg)
+		panic(err)
+	}
+
+	err = labelSelectCountryElement.Click()
+	beego.Info("Кликнули " + msg)
+	if err != nil {
+		beego.Error("Не кликнулся " + msg)
+		panic(err)
+	}
+
+	selectCountryElement, err := webDriver.FindElement(selenium.ByXPATH, selectCountryXpath)
+	msg = "пункт выбора страны"
+	if err != nil {
+		beego.Error("Не нашёлся " + msg)
+		panic(err)
+	}
+
+	err = selectCountryElement.Click()
+	beego.Info("Кликнули " + msg)
+	if err != nil {
+		beego.Error("Не кликнулся " + msg)
+		panic(err)
+	}
+
+	beego.Info("Указана страна")
+	time.Sleep(2 * time.Second)
+
+	//time.Sleep(10 * time.Second)
 }

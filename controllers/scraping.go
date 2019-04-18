@@ -208,9 +208,10 @@ func TestSetSearchFilters(webDriver selenium.WebDriver) {
 	pageobjects.SetAuctionType(webDriver, settings)
 
 	// Указать вид договора
-	pageobjects.SetContractType(webDriver)
+	pageobjects.SetContractType(webDriver, settings)
 
 	// Указать страну
+	pageobjects.SetCountry(webDriver)
 
 	// Указать местоположение имущества
 
