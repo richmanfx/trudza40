@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/tebeka/selenium"
 	"strconv"
+	"time"
 	"trudza40/models"
 	"trudza40/pageobjects"
 )
@@ -214,13 +215,17 @@ func TestSetSearchFilters(webDriver selenium.WebDriver) {
 	pageobjects.SetCountry(webDriver)
 
 	// Указать местоположение имущества
+	pageobjects.SetPropertyLocation(webDriver, settings)
 
 	// Указать диапазон площади объекта
+	pageobjects.SetObjectAreaRange(webDriver, settings)
 
 	// Указать минимальный срок аренды
 
 	// Искать
 
 	// Дождаться отображения объектов
+
+	time.Sleep(10 * time.Second)
 
 }

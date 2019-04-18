@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/tebeka/selenium"
+	"strconv"
 	"time"
 	"trudza40/models"
 )
@@ -223,5 +224,87 @@ func SetCountry(webDriver selenium.WebDriver) {
 	beego.Info("Указана страна")
 	time.Sleep(2 * time.Second)
 
-	//time.Sleep(10 * time.Second)
+}
+
+// Указать местоположение имущества
+func SetPropertyLocation(webDriver selenium.WebDriver, settings *models.Settings) {
+
+	locationImgXpath := "//td/label[text()='Местоположение:']/.." +
+		"/following-sibling::td[1]//table//tr/td/a[@title='Выбрать']/img"
+
+	imgButton, err := webDriver.FindElement(selenium.ByXPATH, locationImgXpath)
+	msg := "кнопка с изображением 'Местоположение'"
+	if err != nil {
+		beego.Error("Не нашлась " + msg)
+		panic(err)
+	}
+
+	err = imgButton.Click()
+	if err != nil {
+		beego.Error("Не кликнулась " + msg)
+		panic(err)
+	}
+
+	beego.Info("Кликнута " + msg)
+	time.Sleep(2 * time.Second)
+
+	// Субъект РФ
+	fieldXpath := "//input[@name='container1:level1']"
+
+	fieldElement, err := webDriver.FindElement(selenium.ByXPATH, fieldXpath)
+	msg = "поле 'Субъект РФ'"
+	if err != nil {
+		beego.Error("Не нашлось " + msg)
+		panic(err)
+	}
+
+	err = fieldElement.SendKeys(settings.PropertyLocation)
+	if err != nil {
+		beego.Error("Не введено значение в " + msg)
+		panic(err)
+	}
+
+	beego.Info(fmt.Sprintf("Введено значение '%s' в %s", settings.PropertyLocation, msg))
+	time.Sleep(2 * time.Second)
+
+	// Кнопка "Выбрать"
+	buttonXpath := "//ins[text()='Выбрать']"
+	buttonElement, err := webDriver.FindElement(selenium.ByXPATH, buttonXpath)
+
+	msg = "кнопка 'Выбрать'"
+	if err != nil {
+		beego.Error("Не нашлась " + msg)
+		panic(err)
+	}
+
+	err = buttonElement.Click()
+	if err != nil {
+		beego.Error("Не кликнулась " + msg)
+		panic(err)
+	}
+
+	beego.Info("Кликнута " + msg)
+	time.Sleep(2 * time.Second)
+}
+
+// Указать диапазон площади объекта		TODO: Два раза вызывать метод ввода в поле !!!!
+func SetObjectAreaRange(webDriver selenium.WebDriver, settings *models.Settings) {
+
+	minFieldXpath := "//input[@name='extended:areaMeters:stringAreaMetersFrom']"
+	minField, err := webDriver.FindElement(selenium.ByXPATH, minFieldXpath)
+	msg := "поле 'Площадь (м²) с'"
+	if err != nil {
+		beego.Error("Не нашлось " + msg)
+		panic(err)
+	}
+
+	err = minField.SendKeys(strconv.Itoa(int(settings.MinArea)))
+	if err != nil {
+		beego.Error("Не введено значение в " + msg)
+		panic(err)
+	}
+
+	beego.Info(fmt.Sprintf("Введено значение '%d' в %s", settings.MinArea, msg))
+	time.Sleep(2 * time.Second)
+
 }
