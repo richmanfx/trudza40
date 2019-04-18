@@ -11,6 +11,13 @@ import (
 /* Войти в расширенный поиск */
 func ComeInExtSearch(webDriver selenium.WebDriver) {
 
+	// Закрыть алерт
+	err := webDriver.AcceptAlert()
+	if err != nil {
+		beego.Error("Не закрылся Аллерт")
+		panic(err)
+	}
+
 	extSearchButtonXpath := "//ins[@id='ext_search']"
 	btn, err := webDriver.FindElement(selenium.ByXPATH, extSearchButtonXpath)
 
