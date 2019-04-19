@@ -221,6 +221,7 @@ func TestSetSearchFilters(webDriver selenium.WebDriver) {
 	pageobjects.SetObjectAreaRange(webDriver, settings)
 
 	// Указать минимальный срок аренды
+	pageobjects.SetRentalPeriod(webDriver, settings)
 
 	// Искать
 

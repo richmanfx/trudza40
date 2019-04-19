@@ -71,7 +71,6 @@ func SetAuctionType(webDriver selenium.WebDriver, settings *models.Settings) {
 	seleniumError(err, fmt.Sprintf("Не кликнулся чекбокс '%s' ", settings.PropertyType))
 
 	beego.Info("Выбран чекбокс " + settings.PropertyType)
-	time.Sleep(2 * time.Second)
 
 	// Кнопка "Выбрать"
 	msg = "кнопка 'Выбрать'"
@@ -113,7 +112,6 @@ func SetContractType(webDriver selenium.WebDriver, settings *models.Settings) {
 	seleniumError(err, fmt.Sprintf("Не кликнулся чекбокс '%s' ", settings.ContractType))
 
 	beego.Info("Выбран чекбокс " + settings.ContractType)
-	time.Sleep(2 * time.Second)
 
 	// Кнопка "Выбрать"
 	msg = "кнопка 'Выбрать'"
@@ -130,7 +128,7 @@ func SetContractType(webDriver selenium.WebDriver, settings *models.Settings) {
 
 }
 
-// Указать страну
+/* Указать страну */
 func SetCountry(webDriver selenium.WebDriver) {
 
 	labelSelectCountryXpath := "//label[text()='Страна размещения:']"
@@ -157,7 +155,7 @@ func SetCountry(webDriver selenium.WebDriver) {
 
 }
 
-// Указать местоположение имущества
+/* Указать местоположение имущества */
 func SetPropertyLocation(webDriver selenium.WebDriver, settings *models.Settings) {
 
 	locationImgXpath := "//td/label[text()='Местоположение:']/.." +
@@ -184,7 +182,6 @@ func SetPropertyLocation(webDriver selenium.WebDriver, settings *models.Settings
 	seleniumError(err, "Не введено значение в "+msg)
 
 	beego.Info(fmt.Sprintf("Введено значение '%s' в %s", settings.PropertyLocation, msg))
-	time.Sleep(2 * time.Second)
 
 	// Кнопка "Выбрать"
 	buttonXpath := "//ins[text()='Выбрать']"
@@ -200,31 +197,42 @@ func SetPropertyLocation(webDriver selenium.WebDriver, settings *models.Settings
 	time.Sleep(2 * time.Second)
 }
 
-// Указать диапазон площади объекта
+/* Указать диапазон площади объекта */
 func SetObjectAreaRange(webDriver selenium.WebDriver, settings *models.Settings) {
 
+	msg := "поле 'Площадь (м²) с'"
+
 	minFieldXpath := "//input[@name='extended:areaMeters:stringAreaMetersFrom']"
-	inputValueInField(webDriver, minFieldXpath, settings.MinArea)
+	inputValueInField(webDriver, minFieldXpath, settings.MinArea, msg)
 
 	maxFieldXpath := "//input[@name='extended:areaMeters:stringAreaMetersTo']"
-	inputValueInField(webDriver, maxFieldXpath, settings.MaxArea)
+	inputValueInField(webDriver, maxFieldXpath, settings.MaxArea, msg)
 
 }
 
-// Ввод значения в поле ввода
-func inputValueInField(webDriver selenium.WebDriver, fieldXpath string, area uint) {
+/* Ввод значения в поле ввода */
+func inputValueInField(webDriver selenium.WebDriver, fieldXpath string, area uint, msg string) {
 	fieldElement, err := webDriver.FindElement(selenium.ByXPATH, fieldXpath)
-	msg := "поле 'Площадь (м²) с'"
+
 	seleniumError(err, "Не нашлось "+msg)
 	err = fieldElement.SendKeys(strconv.Itoa(int(area)))
 	seleniumError(err, "Не введено значение в "+msg)
 	beego.Info(fmt.Sprintf("Введено значение '%d' в %s", area, msg))
 }
 
-// Обработка селениумных ошибок
+/* Обработка селениумных ошибок */
 func seleniumError(err error, msg string) {
 	if err != nil {
 		beego.Error(fmt.Sprintf("%s: '%s'", msg, err))
 		panic(err)
 	}
+}
+
+/* Указать минимальный срок аренды */
+func SetRentalPeriod(webDriver selenium.WebDriver, settings *models.Settings) {
+
+	msg := "поле 'Срок аренды (мес.) с:'"
+	fieldXpath := "//input[@name='extended:propertyExtended:stringRentFrom']"
+	inputValueInField(webDriver, fieldXpath, settings.MinRentalPeriod*12, msg)
+
 }
