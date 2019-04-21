@@ -6,7 +6,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/tebeka/selenium"
 	"strconv"
-	"time"
+	"strings"
 	"trudza40/models"
 	"trudza40/pageobjects"
 )
@@ -175,9 +175,14 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 	// Удалённый ВебДрайвер
 	webDriver, err = selenium.NewRemote(capabilities, fmt.Sprintf("http://localhost:%d/wd/hub", remoteDriverPort))
 	if err != nil {
+		beego.Error("Не смогли получить удалённый WebDriver")
 		panic(err)
 	}
-	defer webDriver.Quit()
+	defer func() {
+		if err := webDriver.Quit(); err != nil {
+			beego.Error("Не смогли выйти из инстанса браузера (закрыть WebDriver)")
+		}
+	}()
 
 	// Выставить размеры окна браузера
 	err = webDriver.ResizeWindow("", int(settings.BrowserWidth), int(settings.BrowserHeight))
@@ -188,16 +193,110 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 	// Открыть страницу
 	err = webDriver.Get(settings.HostPageUrl)
 	if err != nil {
+		beego.Error("Не открылся сайт")
 		panic(err)
 	}
 
 	// Выставить фильтры поиска
-	TestSetSearchFilters(webDriver)
+	SetSearchFilters(webDriver)
+
+	// Искать
+	ObjectsSearch(webDriver)
+
+	// Собрать информацию по объектам на всех страницах
+	ObjectInfoCollect(webDriver)
+
+}
+
+func ObjectInfoCollect(webDriver selenium.WebDriver) {
+
+	// Определить количество найденных объектов
+	quantity := pageobjects.GetObjectsQuantity(webDriver)
+	beego.Info("Количество найденных объектов: ", quantity)
+
+	// Собрать иформацию об объектах на текущей странице в коллекцию
+	objectInfo := onePageObjectInfoCollect(webDriver)
+	beego.Info(objectInfo)
+
+	// Добавить к основной коллекци
+
+	// Есть ли следующая страница - рекурсия
+}
+
+/* Собрать иформацию об объектах на текущей странице в коллекцию */
+func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo {
+
+	var objects []models.ObjectInfo
+
+	// Количество объектов на данной странице
+	realObjectXpath := "//div[@class='scrollx']/table//tr[contains(@class,'datarow')]"
+	realObjects, err := webDriver.FindElements(selenium.ByXPATH, realObjectXpath)
+	pageobjects.SeleniumError(err, "Не нашлось количество объектов недвижимости на странице")
+	realObjectsQuantity := len(realObjects)
+	beego.Info("количество объектов недвижимости на странице:", realObjectsQuantity)
+
+	// Номера извещений объектов
+	noticeNumbersXpath := realObjectXpath + "/td[3]/span/span[1]"
+	objectsNoticeNumbers, err := webDriver.FindElements(selenium.ByXPATH, noticeNumbersXpath)
+	pageobjects.SeleniumError(err, "Не нашлись номера извещений объектов")
+	beego.Info(objectsNoticeNumbers)
+
+	// Площадь объектов
+	areaXpath := realObjectXpath + "/td[3]/span/span[4]"
+	objectsAreas, err := webDriver.FindElements(selenium.ByXPATH, areaXpath)
+	pageobjects.SeleniumError(err, "Не нашлись площади объектов")
+	beego.Info(objectsAreas)
+
+	// Стоимость аренды в месяц
+	rentXpath := realObjectXpath + "/td[7]/span"
+	objectsRent, err := webDriver.FindElements(selenium.ByXPATH, rentXpath)
+	pageobjects.SeleniumError(err, "Не нашлись стоимости аренды объектов")
+	beego.Info(objectsRent)
+
+	// Срок аренды
+	rentPeriodsXpath := realObjectXpath + "/td[6]/span/span[2]"
+	objectsRentPeriods, err := webDriver.FindElements(selenium.ByXPATH, rentPeriodsXpath)
+	pageobjects.SeleniumError(err, "Не нашлись сроки аренды объектов")
+	beego.Info(objectsRentPeriods)
+
+	// Ссылка для просмотра
+	linkXpath := realObjectXpath + "/td[1]//a[@title='Просмотр']"
+	objectsLink, err := webDriver.FindElements(selenium.ByXPATH, linkXpath)
+	pageobjects.SeleniumError(err, "Не нашлись ссылки для просмотра объектов")
+	beego.Info(objectsLink)
+
+	// Информацию в коллекцию
+	for index := 0; index < realObjectsQuantity; index++ {
+
+		objectsNoticeNumber, _ := objectsNoticeNumbers[index].Text()
+		beego.Info("Номер извещения", objectsNoticeNumber)
+
+		objectsArea, _ := objectsAreas[index].Text()
+		beego.Info("Площадь", strings.Replace(objectsArea, " м²", "", 1))
+
+		objectRent, _ := objectsRent[index].Text()
+		str1 := strings.Replace(objectRent, ",", ".", -1)
+		str2 := strings.Replace(str1, " ", "", -1)
+		rent := strings.Replace(str2, "руб.", "", -1)
+		beego.Info("Аренда в месяц", rent)
+	}
+
+	return objects
+}
+
+/* Искать */
+func ObjectsSearch(webDriver selenium.WebDriver) {
+
+	// Искать
+	pageobjects.SearchButtonClick(webDriver)
+
+	// Дождаться отображения объектов
+	pageobjects.ObjectsWait(webDriver)
 
 }
 
 /* Выставить фильтры поиска */
-func TestSetSearchFilters(webDriver selenium.WebDriver) {
+func SetSearchFilters(webDriver selenium.WebDriver) {
 
 	// Войти в расширенный поиск
 	pageobjects.ComeInExtSearch(webDriver)
@@ -222,11 +321,5 @@ func TestSetSearchFilters(webDriver selenium.WebDriver) {
 
 	// Указать минимальный срок аренды
 	pageobjects.SetRentalPeriod(webDriver, settings)
-
-	// Искать
-
-	// Дождаться отображения объектов
-
-	time.Sleep(10 * time.Second)
 
 }

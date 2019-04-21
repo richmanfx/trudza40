@@ -41,7 +41,7 @@ func (controller *AuthController) LoginProcessing() {
 		GlobalUserLogin = userName // TODO: Пока заголовок не реализован
 
 		//// Добавить куку с ID пользователя
-		err = userSession.Set("UserID", GlobalUserId)
+		err = userSession.Set("UserID", GlobalUserId) // TODO: Здесь валится
 		time.Sleep(1 * time.Second)
 		if err != nil {
 			beego.Error("Не добавился UserID")

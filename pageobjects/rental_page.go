@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/tebeka/selenium"
 	"strconv"
+	"strings"
 	"time"
 	"trudza40/models"
 )
@@ -14,16 +15,16 @@ func ComeInExtSearch(webDriver selenium.WebDriver) {
 
 	// Закрыть алерт
 	err := webDriver.AcceptAlert()
-	seleniumError(err, "Не закрылся Аллерт")
+	SeleniumError(err, "Не закрылся Аллерт")
 
 	extSearchButtonXpath := "//ins[@id='ext_search']"
 	btn, err := webDriver.FindElement(selenium.ByXPATH, extSearchButtonXpath)
 
 	msg := "кнопка 'Расширенный поиск'"
-	seleniumError(err, "Не нашлась "+msg)
+	SeleniumError(err, "Не нашлась "+msg)
 
 	err = btn.Click()
-	seleniumError(err, "Не кликнулась "+msg)
+	SeleniumError(err, "Не кликнулась "+msg)
 
 	beego.Info("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
@@ -36,10 +37,10 @@ func SetTradesType(webDriver selenium.WebDriver) {
 	link, err := webDriver.FindElement(selenium.ByXPATH, actionTypeLinkXpath)
 
 	msg := "ссылка 'В процессе подачи заявок'"
-	seleniumError(err, "Не нашлась "+msg)
+	SeleniumError(err, "Не нашлась "+msg)
 
 	err = link.Click()
-	seleniumError(err, "Не кликнулась "+msg)
+	SeleniumError(err, "Не кликнулась "+msg)
 
 	beego.Info("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
@@ -54,10 +55,10 @@ func SetAuctionType(webDriver selenium.WebDriver, settings *models.Settings) {
 	propertyTypeImgXpath :=
 		"//td/label[text()='Тип имущества:']/../following-sibling::td[1]//table//tr/td/a[@title='Выбрать']/img"
 	imgButton, err := webDriver.FindElement(selenium.ByXPATH, propertyTypeImgXpath)
-	seleniumError(err, "Не нашлась "+msg)
+	SeleniumError(err, "Не нашлась "+msg)
 
 	err = imgButton.Click()
-	seleniumError(err, "Не кликнулась "+msg)
+	SeleniumError(err, "Не кликнулась "+msg)
 
 	beego.Info("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
@@ -65,10 +66,10 @@ func SetAuctionType(webDriver selenium.WebDriver, settings *models.Settings) {
 	// Чекбокс
 	checkBoxXpath := fmt.Sprintf("//td/span[text()='%s']/preceding-sibling::input", settings.PropertyType)
 	checkBoxElement, err := webDriver.FindElement(selenium.ByXPATH, checkBoxXpath)
-	seleniumError(err, fmt.Sprintf("Не нашёлся чекбокс '%s'", settings.PropertyType))
+	SeleniumError(err, fmt.Sprintf("Не нашёлся чекбокс '%s'", settings.PropertyType))
 
 	err = checkBoxElement.Click()
-	seleniumError(err, fmt.Sprintf("Не кликнулся чекбокс '%s' ", settings.PropertyType))
+	SeleniumError(err, fmt.Sprintf("Не кликнулся чекбокс '%s' ", settings.PropertyType))
 
 	beego.Info("Выбран чекбокс " + settings.PropertyType)
 
@@ -76,10 +77,10 @@ func SetAuctionType(webDriver selenium.WebDriver, settings *models.Settings) {
 	msg = "кнопка 'Выбрать'"
 	buttonXpath := "//ins[text()='Выбрать']"
 	buttonElement, err := webDriver.FindElement(selenium.ByXPATH, buttonXpath)
-	seleniumError(err, "Не нашлась "+msg)
+	SeleniumError(err, "Не нашлась "+msg)
 
 	err = buttonElement.Click()
-	seleniumError(err, "Не кликнулась "+msg)
+	SeleniumError(err, "Не кликнулась "+msg)
 
 	beego.Info("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
@@ -95,10 +96,10 @@ func SetContractType(webDriver selenium.WebDriver, settings *models.Settings) {
 	imgButton, err := webDriver.FindElement(selenium.ByXPATH, contractTypeImgXpath)
 
 	msg := "кнопка с изображением 'Вид договора'"
-	seleniumError(err, "Не нашлась "+msg)
+	SeleniumError(err, "Не нашлась "+msg)
 
 	err = imgButton.Click()
-	seleniumError(err, "Не кликнулась "+msg)
+	SeleniumError(err, "Не кликнулась "+msg)
 
 	beego.Info("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
@@ -106,10 +107,10 @@ func SetContractType(webDriver selenium.WebDriver, settings *models.Settings) {
 	// Чекбокс
 	checkBoxXpath := fmt.Sprintf("//td/span[text()='%s']/preceding-sibling::input", settings.ContractType)
 	checkBoxElement, err := webDriver.FindElement(selenium.ByXPATH, checkBoxXpath)
-	seleniumError(err, fmt.Sprintf("Не нашёлся чекбокс '%s'", settings.ContractType))
+	SeleniumError(err, fmt.Sprintf("Не нашёлся чекбокс '%s'", settings.ContractType))
 
 	err = checkBoxElement.Click()
-	seleniumError(err, fmt.Sprintf("Не кликнулся чекбокс '%s' ", settings.ContractType))
+	SeleniumError(err, fmt.Sprintf("Не кликнулся чекбокс '%s' ", settings.ContractType))
 
 	beego.Info("Выбран чекбокс " + settings.ContractType)
 
@@ -118,10 +119,10 @@ func SetContractType(webDriver selenium.WebDriver, settings *models.Settings) {
 
 	buttonXpath := "//ins[text()='Выбрать']"
 	buttonElement, err := webDriver.FindElement(selenium.ByXPATH, buttonXpath)
-	seleniumError(err, "Не нашлась "+msg)
+	SeleniumError(err, "Не нашлась "+msg)
 
 	err = buttonElement.Click()
-	seleniumError(err, "Не кликнулась "+msg)
+	SeleniumError(err, "Не кликнулась "+msg)
 
 	beego.Info("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
@@ -136,19 +137,19 @@ func SetCountry(webDriver selenium.WebDriver) {
 
 	msg := "селектор выбора страны"
 	labelSelectCountryElement, err := webDriver.FindElement(selenium.ByXPATH, labelSelectCountryXpath)
-	seleniumError(err, "Не нашёлся "+msg)
+	SeleniumError(err, "Не нашёлся "+msg)
 
 	err = labelSelectCountryElement.Click()
 	beego.Info("Кликнули " + msg)
-	seleniumError(err, "Не кликнулся "+msg)
+	SeleniumError(err, "Не кликнулся "+msg)
 
 	selectCountryElement, err := webDriver.FindElement(selenium.ByXPATH, selectCountryXpath)
 	msg = "пункт выбора страны"
-	seleniumError(err, "Не нашёлся "+msg)
+	SeleniumError(err, "Не нашёлся "+msg)
 
 	err = selectCountryElement.Click()
 	beego.Info("Кликнули " + msg)
-	seleniumError(err, "Не кликнулся "+msg)
+	SeleniumError(err, "Не кликнулся "+msg)
 
 	beego.Info("Указана страна")
 	time.Sleep(2 * time.Second)
@@ -163,10 +164,10 @@ func SetPropertyLocation(webDriver selenium.WebDriver, settings *models.Settings
 
 	msg := "кнопка с изображением 'Местоположение'"
 	imgButton, err := webDriver.FindElement(selenium.ByXPATH, locationImgXpath)
-	seleniumError(err, "Не нашлась "+msg)
+	SeleniumError(err, "Не нашлась "+msg)
 
 	err = imgButton.Click()
-	seleniumError(err, "Не кликнулась "+msg)
+	SeleniumError(err, "Не кликнулась "+msg)
 
 	beego.Info("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
@@ -176,10 +177,10 @@ func SetPropertyLocation(webDriver selenium.WebDriver, settings *models.Settings
 
 	msg = "поле 'Субъект РФ'"
 	fieldElement, err := webDriver.FindElement(selenium.ByXPATH, fieldXpath)
-	seleniumError(err, "Не нашлось "+msg)
+	SeleniumError(err, "Не нашлось "+msg)
 
 	err = fieldElement.SendKeys(settings.PropertyLocation)
-	seleniumError(err, "Не введено значение в "+msg)
+	SeleniumError(err, "Не введено значение в "+msg)
 
 	beego.Info(fmt.Sprintf("Введено значение '%s' в %s", settings.PropertyLocation, msg))
 
@@ -188,10 +189,10 @@ func SetPropertyLocation(webDriver selenium.WebDriver, settings *models.Settings
 	buttonElement, err := webDriver.FindElement(selenium.ByXPATH, buttonXpath)
 
 	msg = "кнопка 'Выбрать'"
-	seleniumError(err, "Не нашлась "+msg)
+	SeleniumError(err, "Не нашлась "+msg)
 
 	err = buttonElement.Click()
-	seleniumError(err, "Не кликнулась "+msg)
+	SeleniumError(err, "Не кликнулась "+msg)
 
 	beego.Info("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
@@ -214,14 +215,14 @@ func SetObjectAreaRange(webDriver selenium.WebDriver, settings *models.Settings)
 func inputValueInField(webDriver selenium.WebDriver, fieldXpath string, area uint, msg string) {
 	fieldElement, err := webDriver.FindElement(selenium.ByXPATH, fieldXpath)
 
-	seleniumError(err, "Не нашлось "+msg)
+	SeleniumError(err, "Не нашлось "+msg)
 	err = fieldElement.SendKeys(strconv.Itoa(int(area)))
-	seleniumError(err, "Не введено значение в "+msg)
+	SeleniumError(err, "Не введено значение в "+msg)
 	beego.Info(fmt.Sprintf("Введено значение '%d' в %s", area, msg))
 }
 
 /* Обработка селениумных ошибок */
-func seleniumError(err error, msg string) {
+func SeleniumError(err error, msg string) {
 	if err != nil {
 		beego.Error(fmt.Sprintf("%s: '%s'", msg, err))
 		panic(err)
@@ -235,4 +236,52 @@ func SetRentalPeriod(webDriver selenium.WebDriver, settings *models.Settings) {
 	fieldXpath := "//input[@name='extended:propertyExtended:stringRentFrom']"
 	inputValueInField(webDriver, fieldXpath, settings.MinRentalPeriod*12, msg)
 
+}
+
+/* Кликнуть на кнопке поиска */
+func SearchButtonClick(webDriver selenium.WebDriver) {
+
+	msg := "кнопка 'Поиск'"
+	buttonXpath := "//ins[@id='lot_search']"
+	buttonElement, err := webDriver.FindElement(selenium.ByXPATH, buttonXpath)
+	SeleniumError(err, "Не нашлась "+msg)
+
+	err = buttonElement.Click()
+	SeleniumError(err, "Не нашлась "+msg)
+
+	beego.Info("Кликнута " + msg)
+	time.Sleep(2 * time.Second)
+}
+
+/* Дождаться отображения объектов */
+func ObjectsWait(webDriver selenium.WebDriver) {
+
+	checkXpath := "//h2/span[contains(text(),'найдено лотов')]"
+	labelElement, err := webDriver.FindElement(selenium.ByXPATH, checkXpath)
+	SeleniumError(err, "Поиск не отработал, лоты не нашлись")
+
+	labelIsDisplayed, err := labelElement.IsDisplayed()
+	SeleniumError(err, "Ошибка при проверке отображения лотов")
+
+	if !labelIsDisplayed {
+		beego.Error("Лоты не отобразились")
+	} else {
+		beego.Info("Лоты отобразились - удачный поиск")
+		//_, err = labelElement.LocationInView()		// Вроде бы так и не скролит
+		err = labelElement.MoveTo(0, 0)
+	}
+
+}
+
+/* Определить количество найденных объектов */
+func GetObjectsQuantity(webDriver selenium.WebDriver) int {
+
+	xpath := "//h2/span[contains(text(),'найдено лотов')]"
+	labelElement, err := webDriver.FindElement(selenium.ByXPATH, xpath)
+	SeleniumError(err, "Количество лотов не нашлось")
+	labelText, err := labelElement.Text()
+	splitLabelText := strings.Split(labelText, " ")
+	objectsQuantity, _ := strconv.Atoi(splitLabelText[len(splitLabelText)-1])
+
+	return objectsQuantity
 }
