@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"net/http"
-	"time"
 	"trudza40/models"
 )
 
 var GlobalUserId = 0
-var GlobalUserLogin string
+
+//var GlobalUserLogin string
 
 type AuthController struct {
 	beego.Controller
@@ -38,24 +38,33 @@ func (controller *AuthController) LoginProcessing() {
 		beego.Info(fmt.Sprintf("Пользователь '%s' вошёл в приложение.", userName))
 
 		// Логин пользователя для заголовка
-		GlobalUserLogin = userName // TODO: Пока заголовок не реализован
+		//GlobalUserLogin = userName // TODO: Пока заголовок не реализован
 
-		//// Добавить куку с ID пользователя
-		err = userSession.Set("UserID", GlobalUserId) // TODO: Здесь валится
-		time.Sleep(1 * time.Second)
-		if err != nil {
-			beego.Error("Не добавился UserID")
-		}
-		beego.Info("Добавлен UserID")
+		////// Добавить куку с ID пользователя
+		//userSession, _ = globalSessions.SessionStart(w, r)
+		//defer userSession.SessionRelease(w)
+		////username := userSession.Get("username")
+
+		//err = userSession.Set("username", r.Form["username"])
+		//if err != nil {
+		//	beego.Error("Не добавился username в сессию")
+		//}
+
+		//err = userSession.Set("UserID", GlobalUserId) // TODO: Здесь валится
+		//time.Sleep(1 * time.Second)
+		//if err != nil {
+		//	beego.Error("Не добавился UserID в сессию")
+		//}
+		//beego.Info("Добавлен UserID")
 
 		// Новая сессия с новой кукой
-		userID := controller.StartSession().Get("UserID") // Новая сессия
-
-		beego.Info(fmt.Sprintf("UserID: %v", GlobalUserId))
-		if userID == nil {
-			beego.Info("userID = nil!")
-			return
-		}
+		//userID := controller.StartSession().Get("UserID") // Новая сессия
+		//
+		//beego.Info(fmt.Sprintf("UserID: %v", GlobalUserId))
+		//if userID == nil {
+		//	beego.Info("userID = nil!")
+		//	return
+		//}
 
 		beego.Info("Редирект на '/realty'")
 		controller.Redirect("/realty", http.StatusSeeOther)

@@ -27,7 +27,8 @@ func SessionInit() {
 		beego.Error("Error create session manager")
 	}
 
-	go globalSessions.GC() // Почистить старые сессии
+	//go globalSessions.GC() // Почистить старые сессии
+	globalSessions.GC()
 }
 
 /* Приверить наличие сессии */
