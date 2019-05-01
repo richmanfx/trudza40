@@ -19,6 +19,8 @@ type ScrapController struct {
 var settings *models.Settings
 var allObjectsInfo []models.ObjectInfo
 
+//var log = logs.NewLogger(10000)
+
 /* Настроить параметры для скрапинга сайта "torgi.gov.ru" */
 func (controller *ScrapController) TorgiGovRuSettings() {
 	controller.TplName = "settings-torgi-gov-ru.tpl"
@@ -81,39 +83,39 @@ func (controller *ScrapController) SaveSettings() {
 	settings.SortFieldName = controller.GetString("sort_field_name")
 
 	averageRental, _ := strconv.Atoi(controller.GetString("average_rental"))
-	settings.AverageRental = uint(averageRental)
+	settings.AverageRental = int(averageRental)
 
 	profitMonths, _ := strconv.Atoi(controller.GetString("profit_months"))
-	settings.ProfitMonths = uint(profitMonths)
+	settings.ProfitMonths = int(profitMonths)
 
 	priorRepair, _ := strconv.Atoi(controller.GetString("prior_repair"))
-	settings.PriorRepair = uint(priorRepair)
+	settings.PriorRepair = int(priorRepair)
 
 	contractRegistration, _ := strconv.Atoi(controller.GetString("contract_registration"))
-	settings.ContractRegistration = uint(contractRegistration)
+	settings.ContractRegistration = int(contractRegistration)
 
 	runningCost, _ := strconv.Atoi(controller.GetString("running_cost"))
-	settings.RunningCost = uint(runningCost)
+	settings.RunningCost = int(runningCost)
 
 	yearlyInsurance, _ := strconv.Atoi(controller.GetString("yearly_insurance"))
-	settings.YearlyInsurance = uint(yearlyInsurance)
+	settings.YearlyInsurance = int(yearlyInsurance)
 
 	monthlyHeating, _ := strconv.Atoi(controller.GetString("monthly_heating"))
-	settings.MonthlyHeating = uint(monthlyHeating)
+	settings.MonthlyHeating = int(monthlyHeating)
 
 	housingOfficeMaintenance, _ := strconv.Atoi(controller.GetString("housing_office_maintenance"))
-	settings.HousingOfficeMaintenance = uint(housingOfficeMaintenance)
+	settings.HousingOfficeMaintenance = int(housingOfficeMaintenance)
 
 	accountingService, _ := strconv.Atoi(controller.GetString("accounting_service"))
-	settings.AccountingService = uint(accountingService)
+	settings.AccountingService = int(accountingService)
 
 	requiredProfitMargin, _ := strconv.Atoi(controller.GetString("required_profit_margin"))
-	settings.RequiredProfitMargin = uint(requiredProfitMargin)
+	settings.RequiredProfitMargin = int(requiredProfitMargin)
 
 	o := orm.NewOrm() // Использовать ORM "Ormer"
-	orm.Debug = true  // Логирование ORM запросов
+	orm.Debug = false // Логирование ORM запросов
 
-	num, err := o.QueryTable("settings").Filter("user_id", GlobalUserId).Update(orm.Params{
+	_, err := o.QueryTable("settings").Filter("user_id", GlobalUserId).Update(orm.Params{
 		"user_id":                    GlobalUserId,
 		"settings_name":              settings.SettingsName,
 		"browser_width":              settings.BrowserWidth,
@@ -143,7 +145,7 @@ func (controller *ScrapController) SaveSettings() {
 		"required_profit_margin":     settings.RequiredProfitMargin,
 	})
 	if err == nil {
-		beego.Debug(fmt.Sprintf("Настройки сохранены в БД, записей '%d'", num))
+		//beego.Debug(fmt.Sprintf("Настройки сохранены в БД, записей '%d'", num))
 		controller.TplName = "message-modal.tpl"
 		controller.Data["title"] = "Info"
 		controller.Data["message1"] = "Информация"
@@ -178,6 +180,7 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 	webDriver, err = selenium.NewRemote(capabilities, fmt.Sprintf("http://localhost:%d/wd/hub", remoteDriverPort))
 	if err != nil {
 		beego.Error("Не смогли получить удалённый WebDriver")
+		// TODO: Вывести сообщение об ошибке в браузер
 		panic(err)
 	}
 	defer func() {
@@ -207,14 +210,14 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 
 	// Определить количество найденных объектов
 	quantity := pageobjects.GetObjectsQuantity(webDriver)
-	beego.Info("Количество найденных объектов: ", quantity)
+	//beego.Info(fmt.Sprintf("Количество найденных объектов: %v", quantity))
 
 	// Слайс для информации обо всех объектах со всех страниц
 	allObjectsInfo = make([]models.ObjectInfo, 0, quantity)
 
 	// Собрать информацию по объектам на всех страницах
 	ObjectInfoCollect(webDriver)
-	beego.Debug("Информация об объектах на всех страницах: ", allObjectsInfo)
+	//beego.Debug(fmt.Sprintf("Информация об объектах на всех страницах: %v", allObjectsInfo))
 
 	// Сохранить данные в файле // TODO: А надо ли?
 
@@ -228,6 +231,64 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 /* Рассчитать коэффициент окупаемости для каждого объекта */
 func PaybackCalculation() {
 
+	for _, objectInfo := range allObjectsInfo {
+
+		// Страховка всей площади за год, руб
+		// Стоимость годовой страховки (рубли) в Альфа-Страховании, зависит от площади в метрах
+		// 	  100: 4000,
+		//    300: 6000,
+		//    500: 8000,
+		//    1000: 12000,
+		//    99999999: 20000,
+		var yearAllAreaInsurance int
+		if objectInfo.Area < 100 {
+			yearAllAreaInsurance = int(settings.YearlyInsurance)
+		} else {
+			beego.Error("Площадь объекта больше чем то, на что расчитана страховка")
+			panic("Площадь объекта больше чем то, на что расчитана страховка")
+		}
+		beego.Info("Страховка всей площади за год:", yearAllAreaInsurance)
+
+		// Стоимость предварительного ремонта всей площади
+		allAreaRepair := settings.PriorRepair * int(objectInfo.Area)
+		beego.Info("Стоимость предварительного ремонта всей площади:", allAreaRepair)
+
+		// Стоимость отопления в месяц
+		monthHeating := settings.MonthlyHeating * int(objectInfo.Area)
+		beego.Info("Стоимость отопления в месяц:", monthHeating)
+
+		// Обслуживание ЖЭКом в месяц
+		monthHousingOffice := settings.HousingOfficeMaintenance * int(objectInfo.Area)
+		beego.Info("Стоимость обслуживания ЖЭКом в месяц:", monthHousingOffice)
+
+		// Доход от аренды в месяц
+		monthRentalIncome := settings.AverageRental * int(objectInfo.Area)
+		beego.Info("Доход от аренды в месяц:", monthRentalIncome)
+
+		// Расходы в месяц
+		monthPayout := int(objectInfo.MonthlyRental) + monthHeating + monthRentalIncome + settings.AccountingService +
+			int((settings.ContractRegistration+settings.RunningCost)/objectInfo.RentalPeriod/12)
+		beego.Info("Расходы в месяц:", monthPayout)
+
+		// Доход в год с учётом несдаваемых месяцев
+		yearRentalIncome := monthRentalIncome * settings.ProfitMonths
+		beego.Info("Доход в год с учётом несдаваемых месяцев:", yearRentalIncome)
+
+		// Коэффициент доходности
+		profitMargin := (yearRentalIncome - (monthPayout * 12) - yearAllAreaInsurance) /
+			(settings.ContractRegistration + settings.RunningCost)
+		beego.Info("Коэффициент доходности:", profitMargin)
+
+		// Безубыточность сдачи, руб/кв.м. в месяц
+		lossFreeRent := ((monthPayout * 12) / settings.ProfitMonths) / int(objectInfo.Area)
+		beego.Info("Безубыточность сдачи, руб/кв.м. в месяц:", lossFreeRent)
+
+		// Собрать большой словарь с параметрами объектов для отчёта
+
+		// Отсортировать большой словарь по коэффициенту доходности
+
+	}
+
 }
 
 /* Собрать информацию по объектам на всех страницах */
@@ -235,7 +296,7 @@ func ObjectInfoCollect(webDriver selenium.WebDriver) {
 
 	// Собрать иформацию об объектах на текущей странице
 	objectsInfo := onePageObjectInfoCollect(webDriver)
-	beego.Debug("Информация об объектах на одной странице: ", objectsInfo)
+	//beego.Debug(fmt.Sprintf("Информация об объектах на одной странице: %v", objectsInfo))
 
 	// Добавить к основной коллекци
 	allObjectsInfo = append(allObjectsInfo, objectsInfo...)
@@ -268,37 +329,37 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 	realObjects, err := webDriver.FindElements(selenium.ByXPATH, realObjectXpath)
 	pageobjects.SeleniumError(err, "Не нашлось количество объектов недвижимости на странице")
 	realObjectsQuantity := len(realObjects)
-	beego.Debug("количество объектов недвижимости на странице:", realObjectsQuantity)
+	//beego.Debug("количество объектов недвижимости на странице:", realObjectsQuantity)
 
 	// Номера извещений объектов
 	noticeNumbersXpath := realObjectXpath + "/td[3]/span/span[1]"
 	objectsNoticeNumbers, err := webDriver.FindElements(selenium.ByXPATH, noticeNumbersXpath)
 	pageobjects.SeleniumError(err, "Не нашлись номера извещений объектов")
-	beego.Debug(objectsNoticeNumbers)
+	//beego.Debug(objectsNoticeNumbers)
 
 	// Площадь объектов
 	areaXpath := realObjectXpath + "/td[3]/span/span[4]"
 	objectsAreas, err := webDriver.FindElements(selenium.ByXPATH, areaXpath)
 	pageobjects.SeleniumError(err, "Не нашлись площади объектов")
-	beego.Debug(objectsAreas)
+	//beego.Debug(objectsAreas)
 
 	// Стоимость аренды в месяц
 	rentXpath := realObjectXpath + "/td[7]/span"
 	objectsRent, err := webDriver.FindElements(selenium.ByXPATH, rentXpath)
 	pageobjects.SeleniumError(err, "Не нашлись стоимости аренды объектов")
-	beego.Debug(objectsRent)
+	//beego.Debug(objectsRent)
 
 	// Срок аренды
 	rentPeriodsXpath := realObjectXpath + "/td[6]/span/span[2]"
 	objectsRentPeriods, err := webDriver.FindElements(selenium.ByXPATH, rentPeriodsXpath)
 	pageobjects.SeleniumError(err, "Не нашлись сроки аренды объектов")
-	beego.Debug(objectsRentPeriods)
+	//beego.Debug(objectsRentPeriods)
 
 	// Ссылка для просмотра
 	linkXpath := realObjectXpath + "/td[1]//a[@title='Просмотр']"
 	objectsLinks, err := webDriver.FindElements(selenium.ByXPATH, linkXpath)
 	pageobjects.SeleniumError(err, "Не нашлись ссылки для просмотра объектов")
-	beego.Debug(objectsLinks)
+	//beego.Debug(objectsLinks)
 
 	// Информацию в коллекцию
 	for index := 0; index < realObjectsQuantity; index++ {
@@ -307,32 +368,30 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 
 		// Номер извещения объекта
 		object.NotificationNumber, _ = objectsNoticeNumbers[index].Text()
-		beego.Debug("Номер извещения", object.NotificationNumber)
+		//beego.Debug(fmt.Sprintf("Номер извещения: %s", object.NotificationNumber))
 
 		// Площадь объекта
 		objectsArea, _ := objectsAreas[index].Text()
-		beego.Debug("Площадь", strings.Replace(objectsArea, " м²", "", 1))
-		value, err := strconv.ParseFloat(strings.Replace(objectsArea, " м²", "", 1), 32)
+		//beego.Debug(fmt.Sprintf("Площадь: %s", strings.Replace(objectsArea, " м²", "", 1)))
+		object.Area, err = strconv.ParseFloat(strings.Replace(objectsArea, " м²", "", 1), 64)
 		if err != nil {
 			beego.Error("Ошибка преобразования площади объекта из строки в float: ", err)
 		}
-		object.Area = float32(value)
 
 		// Стоимость аренды в месяц
 		objectRent, _ := objectsRent[index].Text()
 		tempString1 := strings.Replace(objectRent, ",", ".", -1)
 		tempString2 := strings.Replace(tempString1, " ", "", -1)
 		rent := strings.Replace(tempString2, "руб.", "", -1)
-		beego.Debug("Аренда в месяц", rent)
-		value, err = strconv.ParseFloat(rent, 32)
+		//beego.Debug(fmt.Sprintf("Аренда в месяц: %s", rent))
+		object.MonthlyRental, err = strconv.ParseFloat(rent, 64)
 		if err != nil {
 			beego.Error("Ошибка преобразования стоимости аренды объекта из строки в float: ", err)
 		}
-		object.MonthlyRental = float32(value)
 
 		// Срок аренды
 		objectRentPeriod, _ := objectsRentPeriods[index].Text()
-		beego.Debug("Срок аренды", strings.Replace(objectRentPeriod, " лет", "", -1)) // TODO: На странице и "лет", и "мес"???
+		//beego.Debug(fmt.Sprintf("Срок аренды: %s", strings.Replace(objectRentPeriod, " лет", "", -1))) // TODO: На странице и "лет", и "мес"???
 		object.RentalPeriod, err = strconv.Atoi(strings.Replace(objectRentPeriod, " лет", "", -1))
 		if err != nil {
 			beego.Error("Ошибка преобразования срока аренды объекта из строки в int: ", err)
@@ -340,7 +399,7 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 
 		// Ссылка для просмотра
 		object.WebLink, _ = objectsLinks[index].GetAttribute("href")
-		beego.Debug("Ссылка для просмотра", object.WebLink)
+		//beego.Debug(fmt.Sprintf("Ссылка для просмотра: %s", object.WebLink))
 
 		// Добавить в коллекцию информацию про один объект
 		objects = append(objects, object)

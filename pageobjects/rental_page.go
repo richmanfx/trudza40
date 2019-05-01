@@ -26,7 +26,7 @@ func ComeInExtSearch(webDriver selenium.WebDriver) {
 	err = btn.Click()
 	SeleniumError(err, "Не кликнулась "+msg)
 
-	beego.Debug("Кликнута " + msg)
+	//beego.Debug("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
 }
 
@@ -42,7 +42,7 @@ func SetTradesType(webDriver selenium.WebDriver) {
 	err = link.Click()
 	SeleniumError(err, "Не кликнулась "+msg)
 
-	beego.Debug("Кликнута " + msg)
+	//beego.Debug("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
 
 }
@@ -60,7 +60,7 @@ func SetAuctionType(webDriver selenium.WebDriver, settings *models.Settings) {
 	err = imgButton.Click()
 	SeleniumError(err, "Не кликнулась "+msg)
 
-	beego.Debug("Кликнута " + msg)
+	//beego.Debug("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
 
 	// Чекбокс
@@ -71,7 +71,7 @@ func SetAuctionType(webDriver selenium.WebDriver, settings *models.Settings) {
 	err = checkBoxElement.Click()
 	SeleniumError(err, fmt.Sprintf("Не кликнулся чекбокс '%s' ", settings.PropertyType))
 
-	beego.Debug("Выбран чекбокс " + settings.PropertyType)
+	//beego.Debug("Выбран чекбокс " + settings.PropertyType)
 
 	// Кнопка "Выбрать"
 	msg = "кнопка 'Выбрать'"
@@ -82,7 +82,7 @@ func SetAuctionType(webDriver selenium.WebDriver, settings *models.Settings) {
 	err = buttonElement.Click()
 	SeleniumError(err, "Не кликнулась "+msg)
 
-	beego.Debug("Кликнута " + msg)
+	//beego.Debug("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
 
 }
@@ -101,7 +101,7 @@ func SetContractType(webDriver selenium.WebDriver, settings *models.Settings) {
 	err = imgButton.Click()
 	SeleniumError(err, "Не кликнулась "+msg)
 
-	beego.Debug("Кликнута " + msg)
+	//beego.Debug("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
 
 	// Чекбокс
@@ -112,7 +112,7 @@ func SetContractType(webDriver selenium.WebDriver, settings *models.Settings) {
 	err = checkBoxElement.Click()
 	SeleniumError(err, fmt.Sprintf("Не кликнулся чекбокс '%s' ", settings.ContractType))
 
-	beego.Debug("Выбран чекбокс " + settings.ContractType)
+	//beego.Debug("Выбран чекбокс " + settings.ContractType)
 
 	// Кнопка "Выбрать"
 	msg = "кнопка 'Выбрать'"
@@ -124,7 +124,7 @@ func SetContractType(webDriver selenium.WebDriver, settings *models.Settings) {
 	err = buttonElement.Click()
 	SeleniumError(err, "Не кликнулась "+msg)
 
-	beego.Debug("Кликнута " + msg)
+	//beego.Debug("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
 
 }
@@ -140,7 +140,7 @@ func SetCountry(webDriver selenium.WebDriver) {
 	SeleniumError(err, "Не нашёлся "+msg)
 
 	err = labelSelectCountryElement.Click()
-	beego.Debug("Кликнули " + msg)
+	//beego.Debug("Кликнули " + msg)
 	SeleniumError(err, "Не кликнулся "+msg)
 
 	selectCountryElement, err := webDriver.FindElement(selenium.ByXPATH, selectCountryXpath)
@@ -148,10 +148,10 @@ func SetCountry(webDriver selenium.WebDriver) {
 	SeleniumError(err, "Не нашёлся "+msg)
 
 	err = selectCountryElement.Click()
-	beego.Debug("Кликнули " + msg)
+	//beego.Debug("Кликнули " + msg)
 	SeleniumError(err, "Не кликнулся "+msg)
 
-	beego.Debug("Указана страна")
+	//beego.Debug("Указана страна")
 	time.Sleep(2 * time.Second)
 
 }
@@ -169,7 +169,7 @@ func SetPropertyLocation(webDriver selenium.WebDriver, settings *models.Settings
 	err = imgButton.Click()
 	SeleniumError(err, "Не кликнулась "+msg)
 
-	beego.Debug("Кликнута " + msg)
+	//beego.Debug("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
 
 	// Субъект РФ
@@ -182,7 +182,7 @@ func SetPropertyLocation(webDriver selenium.WebDriver, settings *models.Settings
 	err = fieldElement.SendKeys(settings.PropertyLocation)
 	SeleniumError(err, "Не введено значение в "+msg)
 
-	beego.Debug(fmt.Sprintf("Введено значение '%s' в %s", settings.PropertyLocation, msg))
+	//beego.Debug(fmt.Sprintf("Введено значение '%s' в %s", settings.PropertyLocation, msg))
 
 	// Кнопка "Выбрать"
 	buttonXpath := "//ins[text()='Выбрать']"
@@ -194,7 +194,7 @@ func SetPropertyLocation(webDriver selenium.WebDriver, settings *models.Settings
 	err = buttonElement.Click()
 	SeleniumError(err, "Не кликнулась "+msg)
 
-	beego.Debug("Кликнута " + msg)
+	//beego.Debug("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
 }
 
@@ -218,7 +218,7 @@ func inputValueInField(webDriver selenium.WebDriver, fieldXpath string, area uin
 	SeleniumError(err, "Не нашлось "+msg)
 	err = fieldElement.SendKeys(strconv.Itoa(int(area)))
 	SeleniumError(err, "Не введено значение в "+msg)
-	beego.Debug(fmt.Sprintf("Введено значение '%d' в %s", area, msg))
+	//beego.Debug(fmt.Sprintf("Введено значение '%d' в %s", area, msg))
 }
 
 /* Обработка селениумных ошибок */
@@ -249,7 +249,7 @@ func SearchButtonClick(webDriver selenium.WebDriver) {
 	err = buttonElement.Click()
 	SeleniumError(err, "Не нашлась "+msg)
 
-	beego.Debug("Кликнута " + msg)
+	//beego.Debug("Кликнута " + msg)
 	time.Sleep(2 * time.Second)
 }
 

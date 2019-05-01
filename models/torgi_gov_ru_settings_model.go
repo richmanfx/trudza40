@@ -28,17 +28,17 @@ type Settings struct {
 	PropertyLocation string `orm:"size(100)"` // Местоположение имущества (город) (Zb: "Москва (г)")
 	SortFieldName    string `orm:"size(100)"` // Столбец, по которому сортировать ("Коэффициент доходности")
 
-	AverageRental        uint // Средняя стоимость аренды, копеек за кв.м. в месяц
-	ProfitMonths         uint // Количество доходных месяцев в году
-	PriorRepair          uint // Предварительный ремонт, копеек за кв.м.
-	ContractRegistration uint // Стоимость регистрации договора, копеек
-	RunningCost          uint // Мелкие расходы на запуск объекта
-	YearlyInsurance      uint // Стоимость годовой страховки (копейки) в Альфа-Страховании,
-	// зависит от площади в метрах - до 100 кв.м = 4000 копеек
-	MonthlyHeating           uint // Отопление, копеек за кв.м. в месяц
-	HousingOfficeMaintenance uint // Обслуживание ЖЭКом, копеек за кв.м. в месяц
-	AccountingService        uint // Бухгалтерское обслуживание, копеек в месяц
-	RequiredProfitMargin     uint // Требуемый, приемлемый коэффициент доходности
+	AverageRental        int // Средняя стоимость аренды, рублей за кв.м. в месяц
+	ProfitMonths         int // Количество доходных месяцев в году
+	PriorRepair          int // Стоимость предварительного ремонта, рублей за кв.м.
+	ContractRegistration int // Стоимость регистрации договора, рублей
+	RunningCost          int // Мелкие расходы на запуск объекта
+	YearlyInsurance      int // Стоимость годовой страховки в Альфа-Страховании, рубли
+	// зависит от площади в метрах - до 100 кв.м = 4000 рублей
+	MonthlyHeating           int // Отопление, рублей за кв.м. в месяц
+	HousingOfficeMaintenance int // Обслуживание ЖЭКом, рублей за кв.м. в месяц
+	AccountingService        int // Бухгалтерское обслуживание, рублей в месяц
+	RequiredProfitMargin     int // Требуемый, приемлемый коэффициент доходности
 }
 
 func Init() {
@@ -73,7 +73,7 @@ func Init() {
 func GetTorgiGovRuSettings(userId int) *Settings {
 
 	o := orm.NewOrm()
-	orm.Debug = true
+	orm.Debug = false
 	settings := new(Settings)
 	var maps []orm.Params
 
@@ -97,7 +97,7 @@ func GetTorgiGovRuSettings(userId int) *Settings {
 
 }
 
-// Заполнить структуру настроек
+/* Заполнить структуру настроек */
 func SettingsFill(settings *Settings, params []orm.Params) {
 
 	for _, m := range params {
@@ -142,35 +142,35 @@ func SettingsFill(settings *Settings, params []orm.Params) {
 		settings.SortFieldName = fmt.Sprintf("%v", m["SortFieldName"])
 
 		averageRental, _ := strconv.Atoi(fmt.Sprintf("%v", m["AverageRental"]))
-		settings.AverageRental = uint(averageRental)
+		settings.AverageRental = int(averageRental)
 
 		profitMonths, _ := strconv.Atoi(fmt.Sprintf("%v", m["ProfitMonths"]))
-		settings.ProfitMonths = uint(profitMonths)
+		settings.ProfitMonths = int(profitMonths)
 
 		priorRepair, _ := strconv.Atoi(fmt.Sprintf("%v", m["PriorRepair"]))
-		settings.PriorRepair = uint(priorRepair)
+		settings.PriorRepair = int(priorRepair)
 
 		contractRegistration, _ := strconv.Atoi(fmt.Sprintf("%v", m["ContractRegistration"]))
-		settings.ContractRegistration = uint(contractRegistration)
+		settings.ContractRegistration = int(contractRegistration)
 
 		runningCost, _ := strconv.Atoi(fmt.Sprintf("%v", m["RunningCost"]))
-		settings.RunningCost = uint(runningCost)
+		settings.RunningCost = int(runningCost)
 
 		yearlyInsurance, _ := strconv.Atoi(fmt.Sprintf("%v", m["YearlyInsurance"]))
-		settings.YearlyInsurance = uint(yearlyInsurance)
+		settings.YearlyInsurance = int(yearlyInsurance)
 
 		monthlyHeating, _ := strconv.Atoi(fmt.Sprintf("%v", m["MonthlyHeating"]))
-		settings.MonthlyHeating = uint(monthlyHeating)
+		settings.MonthlyHeating = int(monthlyHeating)
 
 		housingOfficeMaintenance, _ := strconv.Atoi(fmt.Sprintf("%v", m["HousingOfficeMaintenance"]))
-		settings.HousingOfficeMaintenance = uint(housingOfficeMaintenance)
+		settings.HousingOfficeMaintenance = int(housingOfficeMaintenance)
 
 		accountingService, _ := strconv.Atoi(fmt.Sprintf("%v", m["AccountingService"]))
-		settings.AccountingService = uint(accountingService)
+		settings.AccountingService = int(accountingService)
 
 		requiredProfitMargin, _ := strconv.Atoi(fmt.Sprintf("%v", m["RequiredProfitMargin"]))
-		settings.RequiredProfitMargin = uint(requiredProfitMargin)
+		settings.RequiredProfitMargin = int(requiredProfitMargin)
 	}
 
-	beego.Info(fmt.Sprintf("Настройки: '%v'", settings))
+	//beego.Info(fmt.Sprintf("Настройки: '%v'", settings))
 }
