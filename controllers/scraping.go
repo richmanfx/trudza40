@@ -162,8 +162,6 @@ func (controller *ScrapController) SaveSettings() {
 
 /* Скрапить сайт "torgi.gov.ru" */
 func (controller *ScrapController) TorgiGovRuScraping() {
-	controller.TplName = "scrap-result.tpl"
-	controller.Data["title"] = "Scraping"
 
 	// Считать данные для скрапинга
 	settings = models.GetTorgiGovRuSettings(GlobalUserId)
@@ -221,15 +219,27 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 
 	// Сохранить данные в файле // TODO: А надо ли?
 
-	// Рассчитать коэффициент окупаемости для каждого объекта
-	PaybackCalculation()
+	// Рассчитать все параметры для каждого объекта
+	scrapResult := PaybackCalculation()
 
 	// Вывести результаты расчётов
+	controller.HtmlReportCreate(scrapResult)
 
 }
 
+/* Вывести результаты расчётов */
+func (controller *ScrapController) HtmlReportCreate(scrapResult []models.ObjectScrapResult) {
+	controller.TplName = "result-torgi-gov-ru.tpl"
+	//controller.Data["titles"] = titles
+	controller.Data["result"] = scrapResult
+	beego.Info("scrapResult:", scrapResult)
+	controller.Data["settings"] = settings
+}
+
 /* Рассчитать коэффициент окупаемости для каждого объекта */
-func PaybackCalculation() {
+func PaybackCalculation() []models.ObjectScrapResult {
+
+	var scrapResult []models.ObjectScrapResult
 
 	for _, objectInfo := range allObjectsInfo {
 
@@ -247,6 +257,7 @@ func PaybackCalculation() {
 			beego.Error("Площадь объекта больше чем то, на что расчитана страховка")
 			panic("Площадь объекта больше чем то, на что расчитана страховка")
 		}
+		beego.Info("\n================================================================================================")
 		beego.Info("Страховка всей площади за год:", yearAllAreaInsurance)
 
 		// Стоимость предварительного ремонта всей площади
@@ -266,7 +277,7 @@ func PaybackCalculation() {
 		beego.Info("Доход от аренды в месяц:", monthRentalIncome)
 
 		// Расходы в месяц
-		monthPayout := int(objectInfo.MonthlyRental) + monthHeating + monthRentalIncome + settings.AccountingService +
+		monthPayout := objectInfo.MonthlyRental + monthHeating + monthRentalIncome + settings.AccountingService +
 			int((settings.ContractRegistration+settings.RunningCost)/objectInfo.RentalPeriod/12)
 		beego.Info("Расходы в месяц:", monthPayout)
 
@@ -283,12 +294,69 @@ func PaybackCalculation() {
 		lossFreeRent := ((monthPayout * 12) / settings.ProfitMonths) / int(objectInfo.Area)
 		beego.Info("Безубыточность сдачи, руб/кв.м. в месяц:", lossFreeRent)
 
-		// Собрать большой словарь с параметрами объектов для отчёта
+		//// Собрать большой словарь с параметрами объектов для отчёта
+		var oneObjectScrapResult models.ObjectScrapResult
 
-		// Отсортировать большой словарь по коэффициенту доходности
+		// Номер извещения
+		oneObjectScrapResult.NotificationNumber = objectInfo.NotificationNumber
+
+		// Коэффициент доходности
+		oneObjectScrapResult.ProfitMargin = profitMargin
+
+		// TODO: пока не скрапилось!!!
+		// Адрес объекта
+		//oneObjectScrapResult.Address =
+
+		// Площадь объекта
+		oneObjectScrapResult.Area = objectInfo.Area
+
+		// TODO: пока не скрапилось!!!
+		// Дата торгов
+		//oneObjectScrapResult.TradingDate =
+
+		// TODO: пока не скрапилось!!!
+		// Сумма залога
+		//oneObjectScrapResult.GuaranteeAmount =
+
+		// Безубыточная сдача
+		oneObjectScrapResult.LossFreeRental = lossFreeRent
+
+		// Выплаты ренты в год
+		oneObjectScrapResult.YearRental = objectInfo.MonthlyRental * 12
+
+		// Выплаты ренты в месяц
+		oneObjectScrapResult.MonthlyRental = objectInfo.MonthlyRental
+
+		// Страховка за год
+		oneObjectScrapResult.YearInsurance = yearAllAreaInsurance
+
+		// Расходы в месяц
+		oneObjectScrapResult.MonthlyCost = monthPayout
+
+		// Стоимость отопления в месяц
+		oneObjectScrapResult.MonthlyHeating = monthHeating
+
+		// Обслуживание ЖЭКом в месяц
+		oneObjectScrapResult.HousingOfficeMaintenance = monthHousingOffice
+
+		// Доход в месяц
+		oneObjectScrapResult.MonthlyProfit = monthRentalIncome
+
+		// Доход в год
+		oneObjectScrapResult.YearProfit = yearRentalIncome
+
+		// Предварительный ремонт
+		oneObjectScrapResult.PriorRepair = allAreaRepair
+
+		// Добавить объект в общий результат
+		scrapResult = append(scrapResult, oneObjectScrapResult)
 
 	}
 
+	// TODO:
+	// Отсортировать большой словарь по значению, указанному в конфиге
+
+	return scrapResult
 }
 
 /* Собрать информацию по объектам на всех страницах */
@@ -300,6 +368,10 @@ func ObjectInfoCollect(webDriver selenium.WebDriver) {
 
 	// Добавить к основной коллекци
 	allObjectsInfo = append(allObjectsInfo, objectsInfo...)
+
+	// **********************************************************
+	return // Для отладки - скрапить только первую страницу
+	// **********************************************************
 
 	// Есть ли следующая страница
 	nextPageXpath := "//a[@title='Перейти на одну страницу вперед']"
@@ -384,7 +456,7 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 		tempString2 := strings.Replace(tempString1, " ", "", -1)
 		rent := strings.Replace(tempString2, "руб.", "", -1)
 		//beego.Debug(fmt.Sprintf("Аренда в месяц: %s", rent))
-		object.MonthlyRental, err = strconv.ParseFloat(rent, 64)
+		object.MonthlyRental, err = strconv.Atoi(rent)
 		if err != nil {
 			beego.Error("Ошибка преобразования стоимости аренды объекта из строки в float: ", err)
 		}

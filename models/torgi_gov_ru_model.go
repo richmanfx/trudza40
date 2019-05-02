@@ -12,17 +12,17 @@ type ObjectScrapResult struct {
 	NotificationNumber       string    // Номер извещения
 	ProfitMargin             int       // Коэффициент доходности
 	Address                  string    // Адрес объекта
-	Area                     float32   // Площадь
+	Area                     float64   // Площадь
 	TradingDate              time.Time // Дата торгов
 	GuaranteeAmount          float32   // Сумма залога
-	LossFreeRental           float32   // Безубыточная сдача, руб/кв.м. в месяц
-	YearRental               float32   // Выплаты ренты в год
-	MonthlyRental            float32   // Выплаты ренты в месяц
+	LossFreeRental           int       // Безубыточная сдача, руб/кв.м. в месяц
+	YearRental               int       // Выплаты ренты в год
+	MonthlyRental            int       // Выплаты ренты в месяц
 	YearInsurance            int       // Страховка за год
-	MonthlyCost              float32   // Расходы в месяц
+	MonthlyCost              int       // Расходы в месяц
 	MonthlyHeating           int       // Стоимость отопления в месяц
 	HousingOfficeMaintenance int       // Обслуживание ЖЭКом в месяц
-	MonthlyProfit            float32   // Доход в месяц
-	YearProfit               float32   // Доход в год
+	MonthlyProfit            int       // Доход в месяц
+	YearProfit               int       // Доход в год
 	PriorRepair              int       // Предварительный ремонт
 }
