@@ -5,8 +5,10 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/tebeka/selenium"
+	"math"
 	"strconv"
 	"strings"
+	"time"
 	"trudza40/models"
 	"trudza40/pageobjects"
 )
@@ -446,8 +448,6 @@ func ObjectInfoCollect(webDriver selenium.WebDriver) {
 /* Собрать иформацию об объектах на текущей странице в коллекцию */
 func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo {
 
-	var objects []models.ObjectInfo
-
 	// Количество объектов на данной странице
 	realObjectXpath := "//div[@class='scrollx']/table//tr[contains(@class,'datarow')]"
 	realObjects, err := webDriver.FindElements(selenium.ByXPATH, realObjectXpath)
@@ -455,86 +455,96 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 	realObjectsQuantity := len(realObjects)
 	//beego.Debug("количество объектов недвижимости на странице:", realObjectsQuantity)
 
+	// Объекты на странице
+	objects := make([]models.ObjectInfo, realObjectsQuantity)
+
 	// Номер извещения
 	noticeNumbersXpath := realObjectXpath + "/td[3]/span/span[1]"
 	objectsNoticeNumbers, err := webDriver.FindElements(selenium.ByXPATH, noticeNumbersXpath)
 	pageobjects.SeleniumError(err, "Не нашлись номера извещений объектов")
 	//beego.Debug(objectsNoticeNumbers)
-
-	// Адрес
-	addressXpath := realObjectXpath + "/td[5]/span"
-	address, err := webDriver.FindElements(selenium.ByXPATH, addressXpath)
-	pageobjects.SeleniumError(err, "Не нашлись адреса объектов")
+	for index := range objects {
+		objects[index].NotificationNumber, err = objectsNoticeNumbers[index].Text()
+		if err != nil {
+			beego.Error("Ошибка при записи номеров извещений: ", err)
+		}
+	}
 
 	// Площадь
 	areaXpath := realObjectXpath + "/td[3]/span/span[4]"
 	objectsAreas, err := webDriver.FindElements(selenium.ByXPATH, areaXpath)
 	pageobjects.SeleniumError(err, "Не нашлись площади объектов")
 	//beego.Debug(objectsAreas)
+	for index := range objects {
+		areaString, _ := objectsAreas[index].Text()
+		objects[index].Area, err = strconv.ParseFloat(strings.Replace(areaString, " м²", "", 1), 64)
+		if err != nil {
+			beego.Error("Ошибка преобразования площади объекта из строки в float: ", err)
+		}
+	}
 
 	// Стоимость аренды в месяц
 	rentXpath := realObjectXpath + "/td[7]/span"
 	objectsRent, err := webDriver.FindElements(selenium.ByXPATH, rentXpath)
 	pageobjects.SeleniumError(err, "Не нашлись стоимости аренды объектов")
 	//beego.Debug(objectsRent)
+	for index := range objects {
+		tempString1, err := objectsRent[index].Text()
+		if err != nil {
+			beego.Error("Ошибка преобразования стоимости аренды объекта в строку: ", err)
+		}
+		tempString2 := strings.Replace(tempString1, ",", ".", -1)
+		tempString3 := strings.Replace(tempString2, " ", "", -1)
+		rent := strings.Replace(tempString3, "руб.", "", -1)
+		tmpFloat, err := strconv.ParseFloat(rent, 64)
+		if err != nil {
+			beego.Error("Ошибка преобразования стоимости аренды объекта из строки в float: ", err)
+		}
+		objects[index].MonthlyRental = int(math.Ceil(tmpFloat)) // Ближайшее большее целое
+	}
 
 	// Срок аренды
+	// TODO: На странице и "лет", и "мес"???
 	rentPeriodsXpath := realObjectXpath + "/td[6]/span/span[2]"
 	objectsRentPeriods, err := webDriver.FindElements(selenium.ByXPATH, rentPeriodsXpath)
 	pageobjects.SeleniumError(err, "Не нашлись сроки аренды объектов")
 	//beego.Debug(objectsRentPeriods)
+	for index := range objects {
+		objectRentPeriodString, err := objectsRentPeriods[index].Text()
+		if err != nil {
+			beego.Error("Ошибка преобразования сроков аренды объекта в строку: ", err)
+		}
+		objects[index].RentalPeriod, err = strconv.Atoi(strings.Replace(objectRentPeriodString, " лет", "", -1))
+		if err != nil {
+			beego.Error("Ошибка преобразования сроков аренды объекта из строки в int: ", err)
+		}
+	}
 
-	// Ссылка для просмотра
+	// Ссылка для просмотра - должна быть последней при скрапинге, так как уходит с основной страницы с объектами
 	linkXpath := realObjectXpath + "/td[1]//a[@title='Просмотр']"
 	objectsLinks, err := webDriver.FindElements(selenium.ByXPATH, linkXpath)
 	pageobjects.SeleniumError(err, "Не нашлись ссылки для просмотра объектов")
-	//beego.Debug(objectsLinks)
-
-	// Информацию в коллекцию
-	for index := 0; index < realObjectsQuantity; index++ {
-
-		var object models.ObjectInfo
-
-		// Номер извещения объекта
-		object.NotificationNumber, _ = objectsNoticeNumbers[index].Text()
-		//beego.Debug(fmt.Sprintf("Номер извещения: %s", object.NotificationNumber))
-
-		// Адрес
-		object.Address, _ = address[index].Text()
-
-		// Площадь объекта
-		objectsArea, _ := objectsAreas[index].Text()
-		//beego.Debug(fmt.Sprintf("Площадь: %s", strings.Replace(objectsArea, " м²", "", 1)))
-		object.Area, err = strconv.ParseFloat(strings.Replace(objectsArea, " м²", "", 1), 64)
+	beego.Debug("Ссылки на объекты: ", objectsLinks)
+	for index := range objects {
+		objects[index].WebLink, err = objectsLinks[index].GetAttribute("href")
 		if err != nil {
-			beego.Error("Ошибка преобразования площади объекта из строки в float: ", err)
+			beego.Error("Ошибка при записи ссылки для просмотра объектов: ", err)
 		}
+		//beego.Debug("Ссылка на объект: ", objects[index].WebLink)
+	}
 
-		// Стоимость аренды в месяц
-		objectRent, _ := objectsRent[index].Text()
-		tempString1 := strings.Replace(objectRent, ",", ".", -1)
-		tempString2 := strings.Replace(tempString1, " ", "", -1)
-		rent := strings.Replace(tempString2, "руб.", "", -1)
-		//beego.Debug(fmt.Sprintf("Аренда в месяц: %s", rent))
-		object.MonthlyRental, err = strconv.Atoi(rent)
-		if err != nil {
-			beego.Error("Ошибка преобразования стоимости аренды объекта из строки в float: ", err)
-		}
+	for index, object := range objects {
+		err = webDriver.Get(object.WebLink)
+		time.Sleep(3 * time.Second)
 
-		// Срок аренды
-		objectRentPeriod, _ := objectsRentPeriods[index].Text()
-		//beego.Debug(fmt.Sprintf("Срок аренды: %s", strings.Replace(objectRentPeriod, " лет", "", -1))) // TODO: На странице и "лет", и "мес"???
-		object.RentalPeriod, err = strconv.Atoi(strings.Replace(objectRentPeriod, " лет", "", -1))
-		if err != nil {
-			beego.Error("Ошибка преобразования срока аренды объекта из строки в int: ", err)
-		}
+		// Полный адрес
+		pageobjects.SeleniumError(err, "Не открыласть страница объекта")
+		fullAddressXpath := "//label[contains(text(),'Детальное местоположение имущества')]/../../td/span"
+		fullAddress, err := webDriver.FindElement(selenium.ByXPATH, fullAddressXpath)
+		pageobjects.SeleniumError(err, "Не нашёлся полный адрес")
+		objects[index].Address, _ = fullAddress.Text()
 
-		// Ссылка для просмотра
-		object.WebLink, _ = objectsLinks[index].GetAttribute("href")
-		//beego.Debug(fmt.Sprintf("Ссылка для просмотра: %s", object.WebLink))
-
-		// Добавить в коллекцию информацию про один объект
-		objects = append(objects, object)
+		// Дата торгов
 
 	}
 

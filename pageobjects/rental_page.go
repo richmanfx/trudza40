@@ -259,7 +259,7 @@ func ObjectsWait(webDriver selenium.WebDriver) {
 	checkXpath := "//h2/span[contains(text(),'найдено лотов')]"
 	labelElement, err := webDriver.FindElement(selenium.ByXPATH, checkXpath)
 	SeleniumError(err, "Поиск не отработал, лоты не нашлись")
-	time.Sleep(3 * time.Second)
+	time.Sleep(4 * time.Second)
 	labelIsDisplayed, err := labelElement.IsDisplayed()
 	SeleniumError(err, "Ошибка при проверке отображения лотов")
 
