@@ -222,15 +222,31 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 	// Рассчитать все параметры для каждого объекта
 	scrapResult := PaybackCalculation()
 
+	// Подготовить заголовки столбцов
+	titles := getTableTitles()
+
 	// Вывести результаты расчётов
-	controller.HtmlReportCreate(scrapResult)
+	controller.HtmlReportCreate(titles, scrapResult)
 
 }
 
+/* Подготовить заголовки столбцов таблицы */
+func getTableTitles() []string {
+
+	var titles []string
+
+	titles = append(titles, "N")
+	titles = append(titles, "Номер извещения")
+	titles = append(titles, "Коэффициент доходности")
+	titles = append(titles, "Площадь, кв.м")
+
+	return titles
+}
+
 /* Вывести результаты расчётов */
-func (controller *ScrapController) HtmlReportCreate(scrapResult []models.ObjectScrapResult) {
+func (controller *ScrapController) HtmlReportCreate(titles []string, scrapResult []models.ObjectScrapResult) {
 	controller.TplName = "result-torgi-gov-ru.tpl"
-	//controller.Data["titles"] = titles
+	controller.Data["titles"] = titles
 	controller.Data["result"] = scrapResult
 	beego.Info("scrapResult:", scrapResult)
 	controller.Data["settings"] = settings
@@ -356,6 +372,18 @@ func PaybackCalculation() []models.ObjectScrapResult {
 	// TODO:
 	// Отсортировать большой словарь по значению, указанному в конфиге
 
+	// TODO:
+	// Проставить порядковый номер в первом столбце
+	scrapResult = SetObjectSerialNumber(scrapResult) // TODO: сделать с указателем
+
+	return scrapResult
+}
+
+/* Проставить порядковый номер объекта в первом столбце таблицы */
+func SetObjectSerialNumber(scrapResult []models.ObjectScrapResult) []models.ObjectScrapResult {
+	for index := range scrapResult {
+		scrapResult[index].OrderNumber = index + 1
+	}
 	return scrapResult
 }
 

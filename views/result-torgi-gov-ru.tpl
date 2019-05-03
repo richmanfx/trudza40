@@ -40,14 +40,28 @@
         <caption>{{ .settings.PropertyLocation }}, {{ .settings.ContractType }}</caption>
 
         {{/* Заголовки столбцов */}}
-
-            {{ range .result}}
-                <tr>
-                    <td>{{ .NotificationNumber }}</td>
-                    <td>{{ .ProfitMargin }}</td>
-                    <td>{{ .Area }}</td>
-                </tr>
+        <tr>
+            {{ range .titles}}
+                <th>{{ . }}</th>
             {{ end }}
+        </tr>
+
+        {{/* Тело таблицы */}}
+        {{ range .result }}
+            <tr>
+                <td>{{ .OrderNumber }}</td>
+                <td>{{ .NotificationNumber }}</td>
+
+                {{/* Зелёный/Красный коэффициент доходности*/}}
+                {{ if (ge .ProfitMargin $.settings.RequiredProfitMargin)}}
+                    <td class="gud-payback">{{ .ProfitMargin }}</td>
+                {{ else }}
+                    <td class="bad-payback">{{ .ProfitMargin }}</td>
+                {{ end }}
+
+                <td>{{ .Area }}</td>
+            </tr>
+        {{ end }}
 
 
     </table>
