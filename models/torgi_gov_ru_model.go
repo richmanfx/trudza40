@@ -25,4 +25,5 @@ type ObjectScrapResult struct {
 	MonthlyProfit            int       // Доход в месяц
 	YearProfit               int       // Доход в год
 	PriorRepair              int       // Предварительный ремонт
+	WebLink                  string    // Ссылка для просмотра
 }

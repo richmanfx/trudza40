@@ -316,6 +316,9 @@ func PaybackCalculation() []models.ObjectScrapResult {
 		// Номер извещения
 		oneObjectScrapResult.NotificationNumber = objectInfo.NotificationNumber
 
+		// Ссылка на объект на сайте
+		oneObjectScrapResult.WebLink = objectInfo.WebLink
+
 		// Коэффициент доходности
 		oneObjectScrapResult.ProfitMargin = profitMargin
 

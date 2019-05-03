@@ -50,7 +50,7 @@
         {{ range .result }}
             <tr>
                 <td>{{ .OrderNumber }}</td>
-                <td>{{ .NotificationNumber }}</td>
+                <td><a href="{{ .WebLink }}"> {{ .NotificationNumber }} </a></td>
 
                 {{/* Зелёный/Красный коэффициент доходности*/}}
                 {{ if (ge .ProfitMargin $.settings.RequiredProfitMargin)}}
