@@ -37,7 +37,11 @@
     <h2>Основные параметры</h2>
 
     <table class="real-table">
-        <caption>{{ .settings.PropertyLocation }}, {{ .settings.ContractType }}</caption>
+        <caption>
+            <strong>
+            {{ .settings.PropertyLocation }}, {{ .settings.ContractType }}
+            </strong>
+        </caption>
 
         {{/* Заголовки столбцов */}}
         <tr>
@@ -59,7 +63,21 @@
                     <td class="bad-payback">{{ .ProfitMargin }}</td>
                 {{ end }}
 
+                <td>{{ .Address }}</td>
                 <td>{{ .Area }}</td>
+                <td>{{ .TradingDate }}</td>
+                <td>{{ .GuaranteeAmount }}</td>
+                <td>{{ .LossFreeRental }}</td>
+                <td>{{ .MonthlyProfit }}</td>
+                <td>{{ .MonthlyCost }}</td>
+                <td>{{ .MonthlyRental }}</td>
+                <td>{{ .MonthlyHeating }}</td>
+                <td>{{ .HousingOfficeMaintenance }}</td>
+                <td>{{ .YearProfit }}</td>
+                <td>{{ .YearRental }}</td>
+                <td>{{ .YearInsurance }}</td>
+                <td>{{ .PriorRepair }}</td>
+
             </tr>
         {{ end }}
 

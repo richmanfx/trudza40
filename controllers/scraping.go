@@ -163,6 +163,8 @@ func (controller *ScrapController) SaveSettings() {
 /* Скрапить сайт "torgi.gov.ru" */
 func (controller *ScrapController) TorgiGovRuScraping() {
 
+	//controller.ProgressBarShow()		// TODO: не работает пока
+
 	// Считать данные для скрапинга
 	settings = models.GetTorgiGovRuSettings(GlobalUserId)
 
@@ -230,6 +232,11 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 
 }
 
+func (controller *ScrapController) ProgressBarShow() {
+	controller.TplName = "message-modal.tpl"
+	controller.Data["message2"] = "<progress class=\"progress is-large is-info\" max=\"100\">60%</progress>"
+}
+
 /* Подготовить заголовки столбцов таблицы */
 func getTableTitles() []string {
 
@@ -238,7 +245,22 @@ func getTableTitles() []string {
 	titles = append(titles, "N")
 	titles = append(titles, "Номер извещения")
 	titles = append(titles, "Коэффициент доходности")
+	titles = append(titles, "Адрес")
 	titles = append(titles, "Площадь, кв.м")
+	titles = append(titles, "Дата торгов")
+	titles = append(titles, "Сумма залога")
+	titles = append(titles, "Безубыточная сдача, руб/кв.м. в месяц")
+
+	titles = append(titles, "Доход в месяц, рублей")
+	titles = append(titles, "Расходы в месяц, рублей")
+	titles = append(titles, "Выплата ренты в месяц, рублей")
+	titles = append(titles, "Стоимость отопления в месяц, рублей")
+	titles = append(titles, "Обслуживание ЖЭКом в месяц, рублей")
+
+	titles = append(titles, "Доход в год, рублей")
+	titles = append(titles, "Выплата ренты в год, рублей")
+	titles = append(titles, "Страховка за год, рублей")
+	titles = append(titles, "Предварительный ремонт, рублей")
 
 	return titles
 }
@@ -322,9 +344,8 @@ func PaybackCalculation() []models.ObjectScrapResult {
 		// Коэффициент доходности
 		oneObjectScrapResult.ProfitMargin = profitMargin
 
-		// TODO: пока не скрапилось!!!
 		// Адрес объекта
-		//oneObjectScrapResult.Address =
+		oneObjectScrapResult.Address = objectInfo.Address
 
 		// Площадь объекта
 		oneObjectScrapResult.Area = objectInfo.Area
@@ -434,13 +455,18 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 	realObjectsQuantity := len(realObjects)
 	//beego.Debug("количество объектов недвижимости на странице:", realObjectsQuantity)
 
-	// Номера извещений объектов
+	// Номер извещения
 	noticeNumbersXpath := realObjectXpath + "/td[3]/span/span[1]"
 	objectsNoticeNumbers, err := webDriver.FindElements(selenium.ByXPATH, noticeNumbersXpath)
 	pageobjects.SeleniumError(err, "Не нашлись номера извещений объектов")
 	//beego.Debug(objectsNoticeNumbers)
 
-	// Площадь объектов
+	// Адрес
+	addressXpath := realObjectXpath + "/td[5]/span"
+	address, err := webDriver.FindElements(selenium.ByXPATH, addressXpath)
+	pageobjects.SeleniumError(err, "Не нашлись адреса объектов")
+
+	// Площадь
 	areaXpath := realObjectXpath + "/td[3]/span/span[4]"
 	objectsAreas, err := webDriver.FindElements(selenium.ByXPATH, areaXpath)
 	pageobjects.SeleniumError(err, "Не нашлись площади объектов")
@@ -472,6 +498,9 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 		// Номер извещения объекта
 		object.NotificationNumber, _ = objectsNoticeNumbers[index].Text()
 		//beego.Debug(fmt.Sprintf("Номер извещения: %s", object.NotificationNumber))
+
+		// Адрес
+		object.Address, _ = address[index].Text()
 
 		// Площадь объекта
 		objectsArea, _ := objectsAreas[index].Text()
