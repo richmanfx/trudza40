@@ -536,15 +536,27 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 	for index, object := range objects {
 		err = webDriver.Get(object.WebLink)
 		time.Sleep(3 * time.Second)
-
-		// Полный адрес
 		pageobjects.SeleniumError(err, "Не открыласть страница объекта")
-		fullAddressXpath := "//label[contains(text(),'Детальное местоположение имущества')]/../../td/span"
-		fullAddress, err := webDriver.FindElement(selenium.ByXPATH, fullAddressXpath)
-		pageobjects.SeleniumError(err, "Не нашёлся полный адрес")
+
+		//// На закладку "Общие"
+		tabXpath := "//span[text()='Общие']"
+		tabLink, err := webDriver.FindElement(selenium.ByXPATH, tabXpath)
+		pageobjects.SeleniumError(err, "Не нашлась закладка 'Общие'")
+		err = tabLink.Click()
+		pageobjects.SeleniumError(err, "Не кликнулась закладка 'Общие'")
+		time.Sleep(3 * time.Second)
+
+		// Адрес
+		addressXpath := "//label[contains(text(),'Адрес')]/../../td/span"
+		fullAddress, err := webDriver.FindElement(selenium.ByXPATH, addressXpath)
+		pageobjects.SeleniumError(err, "Не нашёлся адрес")
 		objects[index].Address, _ = fullAddress.Text()
 
 		// Дата торгов
+
+		// Дата окончания подачи заявок
+
+		// Сумма залога
 
 	}
 
