@@ -8,7 +8,6 @@ import (
 	"math"
 	"strconv"
 	"strings"
-	"time"
 	"trudza40/models"
 	"trudza40/pageobjects"
 )
@@ -298,42 +297,46 @@ func PaybackCalculation() []models.ObjectScrapResult {
 			beego.Error("Площадь объекта больше чем то, на что расчитана страховка")
 			panic("Площадь объекта больше чем то, на что расчитана страховка")
 		}
-		beego.Info("\n================================================================================================")
-		beego.Info("Страховка всей площади за год:", yearAllAreaInsurance)
+		//beego.Info("\n================================================================================================")
+		//beego.Info("Страховка всей площади за год:", yearAllAreaInsurance)
 
 		// Стоимость предварительного ремонта всей площади
 		allAreaRepair := settings.PriorRepair * int(objectInfo.Area)
-		beego.Info("Стоимость предварительного ремонта всей площади:", allAreaRepair)
+		//beego.Info("Стоимость предварительного ремонта всей площади:", allAreaRepair)
 
 		// Стоимость отопления в месяц
 		monthHeating := settings.MonthlyHeating * int(objectInfo.Area)
-		beego.Info("Стоимость отопления в месяц:", monthHeating)
+		//beego.Info("Стоимость отопления в месяц:", monthHeating)
 
 		// Обслуживание ЖЭКом в месяц
 		monthHousingOffice := settings.HousingOfficeMaintenance * int(objectInfo.Area)
-		beego.Info("Стоимость обслуживания ЖЭКом в месяц:", monthHousingOffice)
+		//beego.Info("Стоимость обслуживания ЖЭКом в месяц:", monthHousingOffice)
 
 		// Доход от аренды в месяц
 		monthRentalIncome := settings.AverageRental * int(objectInfo.Area)
-		beego.Info("Доход от аренды в месяц:", monthRentalIncome)
+		//beego.Info("Доход от аренды в месяц:", monthRentalIncome)
 
 		// Расходы в месяц
-		monthPayout := objectInfo.MonthlyRental + monthHeating + monthRentalIncome + settings.AccountingService +
-			int((settings.ContractRegistration+settings.RunningCost)/objectInfo.RentalPeriod/12)
-		beego.Info("Расходы в месяц:", monthPayout)
+		monthPayout :=
+			objectInfo.MonthlyRental + // Стоимость аренды в месяц
+				monthHeating + // Стоимость отопления в месяц
+				monthHousingOffice + // Обслуживание ЖЭКом в месяц
+				settings.AccountingService + // Бухгалтерское обслуживание в месяц
+				int((settings.ContractRegistration+settings.RunningCost)/objectInfo.RentalPeriod/12)
+		//beego.Info("Расходы в месяц:", monthPayout)
 
 		// Доход в год с учётом несдаваемых месяцев
 		yearRentalIncome := monthRentalIncome * settings.ProfitMonths
-		beego.Info("Доход в год с учётом несдаваемых месяцев:", yearRentalIncome)
+		//beego.Info("Доход в год с учётом несдаваемых месяцев:", yearRentalIncome)
 
 		// Коэффициент доходности
-		profitMargin := (yearRentalIncome - (monthPayout * 12) - yearAllAreaInsurance) /
+		profitMargin := (yearRentalIncome - (monthPayout*12 + yearAllAreaInsurance)) /
 			(settings.ContractRegistration + settings.RunningCost)
-		beego.Info("Коэффициент доходности:", profitMargin)
+		//beego.Info("Коэффициент доходности:", profitMargin)
 
 		// Безубыточность сдачи, руб/кв.м. в месяц
 		lossFreeRent := ((monthPayout * 12) / settings.ProfitMonths) / int(objectInfo.Area)
-		beego.Info("Безубыточность сдачи, руб/кв.м. в месяц:", lossFreeRent)
+		//beego.Info("Безубыточность сдачи, руб/кв.м. в месяц:", lossFreeRent)
 
 		//// Собрать большой словарь с параметрами объектов для отчёта
 		var oneObjectScrapResult models.ObjectScrapResult
@@ -400,7 +403,6 @@ func PaybackCalculation() []models.ObjectScrapResult {
 	// TODO:
 	// Отсортировать большой словарь по значению, указанному в конфиге
 
-	// TODO:
 	// Проставить порядковый номер в первом столбце
 	scrapResult = SetObjectSerialNumber(scrapResult) // TODO: сделать с указателем
 
@@ -426,7 +428,7 @@ func ObjectInfoCollect(webDriver selenium.WebDriver) {
 	allObjectsInfo = append(allObjectsInfo, objectsInfo...)
 
 	// **********************************************************
-	return // Для отладки - скрапить только первую страницу
+	//return // Для отладки - скрапить только первую страницу
 	// **********************************************************
 
 	// Есть ли следующая страница
@@ -434,7 +436,7 @@ func ObjectInfoCollect(webDriver selenium.WebDriver) {
 	nextPage, err := webDriver.FindElements(selenium.ByXPATH, nextPageXpath)
 	pageobjects.SeleniumError(err, "Ошибка при определении наличия следующей страницы")
 
-	if len(nextPage) < 1 { // Условие выхода из рекурсии
+	if len(nextPage) < 1 { // Условие выхода из рекурсии - нет следующей страницы
 		// Выходим
 		return
 	} else {
@@ -449,6 +451,11 @@ func ObjectInfoCollect(webDriver selenium.WebDriver) {
 
 /* Собрать иформацию об объектах на текущей странице в коллекцию */
 func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo {
+
+	//// Запомнить ссылку
+	//objectsListStartUrl, err := webDriver.CurrentURL()
+	//pageobjects.SeleniumError(err, "Не удалось получить текущий URL")
+	//beego.Info("Запомнили ссылку на страницу со списком объектов: ", objectsListStartUrl)
 
 	// Количество объектов на данной странице
 	realObjectXpath := "//div[@class='scrollx']/table//tr[contains(@class,'datarow')]"
@@ -535,50 +542,56 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 		//beego.Debug("Ссылка на объект: ", objects[index].WebLink)
 	}
 
-	for index, object := range objects {
-		err = webDriver.Get(object.WebLink)
-		time.Sleep(3 * time.Second)
-		pageobjects.SeleniumError(err, "Не открыласть страница объекта")
+	//for index, object := range objects {
+	//	err = webDriver.Get(object.WebLink)
+	//	time.Sleep(3 * time.Second)
+	//	pageobjects.SeleniumError(err, "Не открыласть страница объекта")
+	//
+	//	// Сумма залога
+	//	depositXpath := "//label[contains(text(),'Описание обременения')]/../../td/span"
+	//	deposit, err := webDriver.FindElement(selenium.ByXPATH, depositXpath)
+	//	pageobjects.SeleniumError(err, "Не нашлась информация про залог/депозит")
+	//	objects[index].GuaranteeAmount, _ = deposit.Text()
+	//	if objects[index].GuaranteeAmount == "" {
+	//		depositXpath = "//label[contains(text(),'Размер задатка')]/../../td//table//span"
+	//		deposit, err := webDriver.FindElement(selenium.ByXPATH, depositXpath)
+	//		pageobjects.SeleniumError(err, "Не нашлась информация про задаток")
+	//		objects[index].GuaranteeAmount, _ = deposit.Text()
+	//	}
+	//
+	//	//// На закладку "Общие"
+	//	tabXpath := "//span[text()='Общие']"
+	//	tabLink, err := webDriver.FindElement(selenium.ByXPATH, tabXpath)
+	//	pageobjects.SeleniumError(err, "Не нашлась закладка 'Общие'")
+	//	err = tabLink.Click()
+	//	pageobjects.SeleniumError(err, "Не кликнулась закладка 'Общие'")
+	//	time.Sleep(3 * time.Second)
+	//
+	//	// Адрес
+	//	addressXpath := "//label[contains(text(),'Адрес')]/../../td/span"
+	//	fullAddress, err := webDriver.FindElement(selenium.ByXPATH, addressXpath)
+	//	pageobjects.SeleniumError(err, "Не нашёлся адрес")
+	//	objects[index].Address, _ = fullAddress.Text()
+	//
+	//	// Дата торгов
+	//	auctionDateXpath := "//label[contains(text(),'Дата и время проведения аукциона')]/../../td/span"
+	//	auctionDate, err := webDriver.FindElement(selenium.ByXPATH, auctionDateXpath)
+	//	pageobjects.SeleniumError(err, "Не нашласть дата проведения аукциона")
+	//	objects[index].AuctionData, _ = auctionDate.Text()
+	//
+	//	// Дата окончания подачи заявок
+	//	closingApplicationsDateXpath := "//label[contains(text(),'Дата окончания подачи заявок')]/../../td/span"
+	//	closingApplicationsDate, err := webDriver.FindElement(selenium.ByXPATH, closingApplicationsDateXpath)
+	//	pageobjects.SeleniumError(err, "Не нашласть дата окончания подачи заявок")
+	//	objects[index].ClosingApplicationsDate, _ = closingApplicationsDate.Text()
 
-		// Сумма залога
-		depositXpath := "//label[contains(text(),'Описание обременения')]/../../td/span"
-		deposit, err := webDriver.FindElement(selenium.ByXPATH, depositXpath)
-		pageobjects.SeleniumError(err, "Не нашлась информация про залог/депозит")
-		objects[index].GuaranteeAmount, _ = deposit.Text()
-		if objects[index].GuaranteeAmount == "" {
-			depositXpath = "//label[contains(text(),'Размер задатка')]/../../td//table//span"
-			deposit, err := webDriver.FindElement(selenium.ByXPATH, depositXpath)
-			pageobjects.SeleniumError(err, "Не нашлась информация про задаток")
-			objects[index].GuaranteeAmount, _ = deposit.Text()
-		}
+	//}
 
-		//// На закладку "Общие"
-		tabXpath := "//span[text()='Общие']"
-		tabLink, err := webDriver.FindElement(selenium.ByXPATH, tabXpath)
-		pageobjects.SeleniumError(err, "Не нашлась закладка 'Общие'")
-		err = tabLink.Click()
-		pageobjects.SeleniumError(err, "Не кликнулась закладка 'Общие'")
-		time.Sleep(3 * time.Second)
-
-		// Адрес
-		addressXpath := "//label[contains(text(),'Адрес')]/../../td/span"
-		fullAddress, err := webDriver.FindElement(selenium.ByXPATH, addressXpath)
-		pageobjects.SeleniumError(err, "Не нашёлся адрес")
-		objects[index].Address, _ = fullAddress.Text()
-
-		// Дата торгов
-		auctionDateXpath := "//label[contains(text(),'Дата и время проведения аукциона')]/../../td/span"
-		auctionDate, err := webDriver.FindElement(selenium.ByXPATH, auctionDateXpath)
-		pageobjects.SeleniumError(err, "Не нашласть дата проведения аукциона")
-		objects[index].AuctionData, _ = auctionDate.Text()
-
-		// Дата окончания подачи заявок
-		closingApplicationsDateXpath := "//label[contains(text(),'Дата окончания подачи заявок')]/../../td/span"
-		closingApplicationsDate, err := webDriver.FindElement(selenium.ByXPATH, closingApplicationsDateXpath)
-		pageobjects.SeleniumError(err, "Не нашласть дата окончания подачи заявок")
-		objects[index].ClosingApplicationsDate, _ = closingApplicationsDate.Text()
-
-	}
+	//// Вернуться на страницу со списком объектов
+	//beego.Info("Возврат на страницу со списком объектов: ", objectsListStartUrl)
+	//err = webDriver.Get(objectsListStartUrl)
+	//pageobjects.SeleniumError(err, "Не удалось вернуться на страницу со списком объектов")
+	//time.Sleep(3 * time.Second)
 
 	return objects
 }
