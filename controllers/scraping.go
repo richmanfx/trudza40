@@ -8,6 +8,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"time"
 	"trudza40/models"
 	"trudza40/pageobjects"
 )
@@ -220,7 +221,8 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 	ObjectInfoCollect(webDriver)
 	//beego.Debug(fmt.Sprintf("Информация об объектах на всех страницах: %v", allObjectsInfo))
 
-	// Сохранить данные в файле // TODO: А надо ли?
+	// Собрать дополнительную информацию по каждому объекту
+	AdditionalObjectInfoCollect(webDriver)
 
 	// Рассчитать все параметры для каждого объекта
 	scrapResult := PaybackCalculation()
@@ -230,6 +232,58 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 
 	// Вывести результаты расчётов
 	controller.HtmlReportCreate(titles, scrapResult)
+
+}
+
+/* Собрать дополнительную информацию по каждому объекту */
+func AdditionalObjectInfoCollect(webDriver selenium.WebDriver) {
+
+	for index, object := range allObjectsInfo {
+
+		// Перейти на страницу объекта недвижимости
+		err := webDriver.Get(object.WebLink)
+		time.Sleep(3 * time.Second)
+		pageobjects.SeleniumError(err, "Не открыласть страница объекта")
+
+		// Сумма залога
+		depositXpath := "//label[contains(text(),'Описание обременения')]/../../td/span"
+		deposit, err := webDriver.FindElement(selenium.ByXPATH, depositXpath)
+		pageobjects.SeleniumError(err, "Не нашлась информация про залог/депозит")
+		allObjectsInfo[index].GuaranteeAmount, _ = deposit.Text()
+		if allObjectsInfo[index].GuaranteeAmount == "" {
+			depositXpath = "//label[contains(text(),'Размер задатка')]/../../td//table//span"
+			deposit, err := webDriver.FindElement(selenium.ByXPATH, depositXpath)
+			pageobjects.SeleniumError(err, "Не нашлась информация про задаток")
+			allObjectsInfo[index].GuaranteeAmount, _ = deposit.Text()
+		}
+
+		//// На закладку "Общие"
+		tabXpath := "//span[text()='Общие']"
+		tabLink, err := webDriver.FindElement(selenium.ByXPATH, tabXpath)
+		pageobjects.SeleniumError(err, "Не нашлась закладка 'Общие'")
+		err = tabLink.Click()
+		pageobjects.SeleniumError(err, "Не кликнулась закладка 'Общие'")
+		time.Sleep(3 * time.Second)
+
+		// Адрес
+		addressXpath := "//label[contains(text(),'Адрес')]/../../td/span"
+		fullAddress, err := webDriver.FindElement(selenium.ByXPATH, addressXpath)
+		pageobjects.SeleniumError(err, "Не нашёлся адрес")
+		allObjectsInfo[index].Address, _ = fullAddress.Text()
+
+		// Дата торгов
+		auctionDateXpath := "//label[contains(text(),'Дата и время проведения аукциона')]/../../td/span"
+		auctionDate, err := webDriver.FindElement(selenium.ByXPATH, auctionDateXpath)
+		pageobjects.SeleniumError(err, "Не нашласть дата проведения аукциона")
+		allObjectsInfo[index].AuctionData, _ = auctionDate.Text()
+
+		// Дата окончания подачи заявок
+		closingApplicationsDateXpath := "//label[contains(text(),'Дата окончания подачи заявок')]/../../td/span"
+		closingApplicationsDate, err := webDriver.FindElement(selenium.ByXPATH, closingApplicationsDateXpath)
+		pageobjects.SeleniumError(err, "Не нашласть дата окончания подачи заявок")
+		allObjectsInfo[index].ClosingApplicationsDate, _ = closingApplicationsDate.Text()
+
+	}
 
 }
 
@@ -272,7 +326,7 @@ func (controller *ScrapController) HtmlReportCreate(titles []string, scrapResult
 	controller.TplName = "result-torgi-gov-ru.tpl"
 	controller.Data["titles"] = titles
 	controller.Data["result"] = scrapResult
-	beego.Info("scrapResult:", scrapResult)
+	//beego.Info("scrapResult:", scrapResult)
 	controller.Data["settings"] = settings
 }
 
@@ -533,7 +587,7 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 	linkXpath := realObjectXpath + "/td[1]//a[@title='Просмотр']"
 	objectsLinks, err := webDriver.FindElements(selenium.ByXPATH, linkXpath)
 	pageobjects.SeleniumError(err, "Не нашлись ссылки для просмотра объектов")
-	beego.Debug("Ссылки на объекты: ", objectsLinks)
+	//beego.Debug("Ссылки на объекты: ", objectsLinks)
 	for index := range objects {
 		objects[index].WebLink, err = objectsLinks[index].GetAttribute("href")
 		if err != nil {
@@ -541,51 +595,6 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 		}
 		//beego.Debug("Ссылка на объект: ", objects[index].WebLink)
 	}
-
-	//for index, object := range objects {
-	//	err = webDriver.Get(object.WebLink)
-	//	time.Sleep(3 * time.Second)
-	//	pageobjects.SeleniumError(err, "Не открыласть страница объекта")
-	//
-	//	// Сумма залога
-	//	depositXpath := "//label[contains(text(),'Описание обременения')]/../../td/span"
-	//	deposit, err := webDriver.FindElement(selenium.ByXPATH, depositXpath)
-	//	pageobjects.SeleniumError(err, "Не нашлась информация про залог/депозит")
-	//	objects[index].GuaranteeAmount, _ = deposit.Text()
-	//	if objects[index].GuaranteeAmount == "" {
-	//		depositXpath = "//label[contains(text(),'Размер задатка')]/../../td//table//span"
-	//		deposit, err := webDriver.FindElement(selenium.ByXPATH, depositXpath)
-	//		pageobjects.SeleniumError(err, "Не нашлась информация про задаток")
-	//		objects[index].GuaranteeAmount, _ = deposit.Text()
-	//	}
-	//
-	//	//// На закладку "Общие"
-	//	tabXpath := "//span[text()='Общие']"
-	//	tabLink, err := webDriver.FindElement(selenium.ByXPATH, tabXpath)
-	//	pageobjects.SeleniumError(err, "Не нашлась закладка 'Общие'")
-	//	err = tabLink.Click()
-	//	pageobjects.SeleniumError(err, "Не кликнулась закладка 'Общие'")
-	//	time.Sleep(3 * time.Second)
-	//
-	//	// Адрес
-	//	addressXpath := "//label[contains(text(),'Адрес')]/../../td/span"
-	//	fullAddress, err := webDriver.FindElement(selenium.ByXPATH, addressXpath)
-	//	pageobjects.SeleniumError(err, "Не нашёлся адрес")
-	//	objects[index].Address, _ = fullAddress.Text()
-	//
-	//	// Дата торгов
-	//	auctionDateXpath := "//label[contains(text(),'Дата и время проведения аукциона')]/../../td/span"
-	//	auctionDate, err := webDriver.FindElement(selenium.ByXPATH, auctionDateXpath)
-	//	pageobjects.SeleniumError(err, "Не нашласть дата проведения аукциона")
-	//	objects[index].AuctionData, _ = auctionDate.Text()
-	//
-	//	// Дата окончания подачи заявок
-	//	closingApplicationsDateXpath := "//label[contains(text(),'Дата окончания подачи заявок')]/../../td/span"
-	//	closingApplicationsDate, err := webDriver.FindElement(selenium.ByXPATH, closingApplicationsDateXpath)
-	//	pageobjects.SeleniumError(err, "Не нашласть дата окончания подачи заявок")
-	//	objects[index].ClosingApplicationsDate, _ = closingApplicationsDate.Text()
-
-	//}
 
 	//// Вернуться на страницу со списком объектов
 	//beego.Info("Возврат на страницу со списком объектов: ", objectsListStartUrl)

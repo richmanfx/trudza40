@@ -66,7 +66,7 @@ func (controller *AuthController) LoginProcessing() {
 		//	return
 		//}
 
-		beego.Info("Редирект на '/realty'")
+		//beego.Info("Редирект на '/realty'")
 		controller.Redirect("/realty", http.StatusSeeOther)
 
 	} else {
