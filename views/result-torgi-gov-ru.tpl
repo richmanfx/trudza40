@@ -72,7 +72,7 @@
 
                 <td>{{ .Address }}</td>
                 <td>{{ .Area }}</td>
-                <td>{{ .TradingDate }}</td>
+                <td>{{ .AuctionData }}</td>
                 <td>{{ .GuaranteeAmount }}</td>
                 <td>{{ .LossFreeRental }}</td>
                 <td>{{ .MonthlyProfit }}</td>

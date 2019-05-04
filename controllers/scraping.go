@@ -352,9 +352,8 @@ func PaybackCalculation() []models.ObjectScrapResult {
 		// Площадь объекта
 		oneObjectScrapResult.Area = objectInfo.Area
 
-		// TODO: пока не скрапилось!!!
 		// Дата торгов
-		//oneObjectScrapResult.TradingDate =
+		oneObjectScrapResult.AuctionData = objectInfo.AuctionData
 
 		// TODO: пока не скрапилось!!!
 		// Сумма залога
@@ -553,6 +552,10 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 		objects[index].Address, _ = fullAddress.Text()
 
 		// Дата торгов
+		auctionDataXpath := "//label[contains(text(),'Дата и время проведения аукциона')]/../../td/span"
+		auctionData, err := webDriver.FindElement(selenium.ByXPATH, auctionDataXpath)
+		pageobjects.SeleniumError(err, "Не нашласть дата проведения аукциона")
+		objects[index].AuctionData, _ = auctionData.Text()
 
 		// Дата окончания подачи заявок
 
