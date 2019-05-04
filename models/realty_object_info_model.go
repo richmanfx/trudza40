@@ -9,5 +9,5 @@ type ObjectInfo struct {
 	WebLink                 string  // Ссылка для просмотра
 	AuctionData             string  // Дата проведения аукциона
 	ClosingApplicationsDate string  // Дата окончания подачи заявок
-	GuaranteeAmount         int     // Сумма залога
+	GuaranteeAmount         string  // Информация про залог
 }

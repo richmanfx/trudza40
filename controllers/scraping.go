@@ -540,6 +540,18 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 		time.Sleep(3 * time.Second)
 		pageobjects.SeleniumError(err, "Не открыласть страница объекта")
 
+		// Сумма залога
+		depositXpath := "//label[contains(text(),'Описание обременения')]/../../td/span"
+		deposit, err := webDriver.FindElement(selenium.ByXPATH, depositXpath)
+		pageobjects.SeleniumError(err, "Не нашлась информация про залог/депозит")
+		objects[index].GuaranteeAmount, _ = deposit.Text()
+		if objects[index].GuaranteeAmount == "" {
+			depositXpath = "//label[contains(text(),'Размер задатка')]/../../td//table//span"
+			deposit, err := webDriver.FindElement(selenium.ByXPATH, depositXpath)
+			pageobjects.SeleniumError(err, "Не нашлась информация про задаток")
+			objects[index].GuaranteeAmount, _ = deposit.Text()
+		}
+
 		//// На закладку "Общие"
 		tabXpath := "//span[text()='Общие']"
 		tabLink, err := webDriver.FindElement(selenium.ByXPATH, tabXpath)
@@ -565,8 +577,6 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 		closingApplicationsDate, err := webDriver.FindElement(selenium.ByXPATH, closingApplicationsDateXpath)
 		pageobjects.SeleniumError(err, "Не нашласть дата окончания подачи заявок")
 		objects[index].ClosingApplicationsDate, _ = closingApplicationsDate.Text()
-
-		// Сумма залога
 
 	}
 
