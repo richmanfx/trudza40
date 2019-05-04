@@ -13,26 +13,33 @@
 
     <h1>Объекты недвижимости</h1>
 
-    <h2>Статистические:</h2>
-        <ul>
-            <li>Средняя стоимость аренды: {{ .settings.AverageRental }} руб/кв.м. в месяц </li>
-            <li>Количество доходных месяцев в году: {{ .settings.ProfitMonths }}</li>
-        </ul>
-
-    <h2>Разовые затраты:</h2>
-        <ul>
-            <li>Стоимость регистрации договора: {{ .settings.ContractRegistration }} рублей </li>
-            <li>Расходы на запуск объекта: {{ .settings.RunningCost }} рублей </li>
-        </ul>
-
-    <h2>Расценки:</h2>
-        <ul>
-            <li>Отопление: {{ .settings.MonthlyHeating }} руб/кв.м. в месяц </li>
-            <li>Обслуживание ЖЭКом: {{ .settings.HousingOfficeMaintenance }} руб/кв.м. в месяц </li>
-            <li>Бухгалтерское обслуживание: {{ .settings.AccountingService }} руб/мес. </li>
-            <li>Предварительный ремонт: {{ .settings.PriorRepair }} руб/кв.м. </li>
-        </ul>
-
+    <table class="parameters">
+        <tr>
+            <td class="top-align">
+                <h2>Статистические:</h2>
+                    <ul>
+                        <li>Количество доходных месяцев в году: {{ .settings.ProfitMonths }}</li>
+                        <li>Средняя стоимость аренды: {{ .settings.AverageRental }} руб/кв.м. в месяц </li>
+                    </ul>
+            </td>
+            <td class="top-align">
+                <h2>Разовые затраты:</h2>
+                    <ul>
+                        <li>Расходы на запуск объекта: {{ .settings.RunningCost }} рублей </li>
+                        <li>Стоимость регистрации договора: {{ .settings.ContractRegistration }} рублей </li>
+                    </ul>
+            </td>
+            <td class="top-align">
+                <h2>Расценки:</h2>
+                    <ul>
+                        <li>Отопление: {{ .settings.MonthlyHeating }} руб/кв.м. в месяц </li>
+                        <li>Предварительный ремонт: {{ .settings.PriorRepair }} руб/кв.м. </li>
+                        <li>Бухгалтерское обслуживание: {{ .settings.AccountingService }} руб/мес. </li>
+                        <li>Обслуживание ЖЭКом: {{ .settings.HousingOfficeMaintenance }} руб/кв.м. в месяц </li>
+                    </ul>
+            </td>
+        </tr>
+    </table>
     <br><br>
     <h2>Основные параметры</h2>
 
