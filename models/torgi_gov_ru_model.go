@@ -13,7 +13,8 @@ type ObjectScrapResult struct {
 	Address                  string  // Адрес объекта
 	Area                     float64 // Площадь
 	AuctionData              string  // Дата торгов
-	GuaranteeAmount          float32 // Сумма залога
+	ClosingApplicationsDate  string  // Дата окончания подачи заявок
+	GuaranteeAmount          int     // Сумма залога
 	LossFreeRental           int     // Безубыточная сдача, руб/кв.м. в месяц
 	YearRental               int     // Выплаты ренты в год
 	MonthlyRental            int     // Выплаты ренты в месяц

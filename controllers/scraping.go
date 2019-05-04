@@ -250,6 +250,7 @@ func getTableTitles() []string {
 	titles = append(titles, "Адрес")
 	titles = append(titles, "Площадь, кв.м")
 	titles = append(titles, "Дата торгов")
+	titles = append(titles, "Дата окончания подачи заявок")
 	titles = append(titles, "Сумма залога")
 	titles = append(titles, "Безубыточная сдача, руб/кв.м. в месяц")
 
@@ -355,9 +356,11 @@ func PaybackCalculation() []models.ObjectScrapResult {
 		// Дата торгов
 		oneObjectScrapResult.AuctionData = objectInfo.AuctionData
 
-		// TODO: пока не скрапилось!!!
+		// Дата окончания подачи заявок
+		oneObjectScrapResult.ClosingApplicationsDate = objectInfo.ClosingApplicationsDate
+
 		// Сумма залога
-		//oneObjectScrapResult.GuaranteeAmount =
+		oneObjectScrapResult.GuaranteeAmount = objectInfo.GuaranteeAmount
 
 		// Безубыточная сдача
 		oneObjectScrapResult.LossFreeRental = lossFreeRent
@@ -552,12 +555,16 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 		objects[index].Address, _ = fullAddress.Text()
 
 		// Дата торгов
-		auctionDataXpath := "//label[contains(text(),'Дата и время проведения аукциона')]/../../td/span"
-		auctionData, err := webDriver.FindElement(selenium.ByXPATH, auctionDataXpath)
+		auctionDateXpath := "//label[contains(text(),'Дата и время проведения аукциона')]/../../td/span"
+		auctionDate, err := webDriver.FindElement(selenium.ByXPATH, auctionDateXpath)
 		pageobjects.SeleniumError(err, "Не нашласть дата проведения аукциона")
-		objects[index].AuctionData, _ = auctionData.Text()
+		objects[index].AuctionData, _ = auctionDate.Text()
 
 		// Дата окончания подачи заявок
+		closingApplicationsDateXpath := "//label[contains(text(),'Дата окончания подачи заявок')]/../../td/span"
+		closingApplicationsDate, err := webDriver.FindElement(selenium.ByXPATH, closingApplicationsDateXpath)
+		pageobjects.SeleniumError(err, "Не нашласть дата окончания подачи заявок")
+		objects[index].ClosingApplicationsDate, _ = closingApplicationsDate.Text()
 
 		// Сумма залога
 
