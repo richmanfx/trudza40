@@ -19,9 +19,9 @@ type Settings struct {
 	FlashAllowed  bool   // True - включить подсветку, False - выключить
 	DebugLevel    string `orm:"size(25)"` // Уровень отладочных сообщений
 
-	MinArea          uint   // Минимальная площадь объекта
-	MaxArea          uint   // Максимальная площадь объекта
-	MinRentalPeriod  uint   // Минимальный срок аренды, лет
+	MinArea          int    // Минимальная площадь объекта
+	MaxArea          int    // Максимальная площадь объекта
+	MinRentalPeriod  int    // Минимальный срок аренды, лет
 	PropertyType     string `orm:"size(100)"` // Тип имущества (Zb: "Помещение")
 	ContractType     string `orm:"size(100)"` // Вид договора (Zb: "Договор аренды")
 	Country          string `orm:"size(100)"` // Страна (Zb: "РОССИЯ")
@@ -123,13 +123,13 @@ func SettingsFill(settings *Settings, params []orm.Params) {
 		settings.DebugLevel = fmt.Sprintf("%v", m["DebugLevel"])
 
 		minArea, _ := strconv.Atoi(fmt.Sprintf("%v", m["MinArea"]))
-		settings.MinArea = uint(minArea)
+		settings.MinArea = int(minArea)
 
 		maxArea, _ := strconv.Atoi(fmt.Sprintf("%v", m["MaxArea"]))
-		settings.MaxArea = uint(maxArea)
+		settings.MaxArea = int(maxArea)
 
 		minRentalPeriod, _ := strconv.Atoi(fmt.Sprintf("%v", m["MinRentalPeriod"]))
-		settings.MinRentalPeriod = uint(minRentalPeriod)
+		settings.MinRentalPeriod = int(minRentalPeriod)
 
 		settings.PropertyType = fmt.Sprintf("%v", m["PropertyType"])
 

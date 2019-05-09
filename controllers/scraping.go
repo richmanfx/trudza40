@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/tebeka/selenium"
 	"math"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -70,13 +71,13 @@ func (controller *ScrapController) SaveSettings() {
 	settings.DebugLevel = controller.GetString("debug_level")
 
 	minArea, _ := strconv.Atoi(controller.GetString("min_area"))
-	settings.MinArea = uint(minArea)
+	settings.MinArea = int(minArea)
 
 	maxArea, _ := strconv.Atoi(controller.GetString("max_area"))
-	settings.MaxArea = uint(maxArea)
+	settings.MaxArea = int(maxArea)
 
 	minRentalPeriod, _ := strconv.Atoi(controller.GetString("min_rental_period"))
-	settings.MinRentalPeriod = uint(minRentalPeriod)
+	settings.MinRentalPeriod = int(minRentalPeriod)
 
 	settings.PropertyType = controller.GetString("property_type")
 	settings.ContractType = controller.GetString("contract_type")
@@ -223,9 +224,11 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 
 	// Собрать дополнительную информацию по каждому объекту
 	AdditionalObjectInfoCollect(webDriver)
+	beego.Info("Дополнительные параметры соскраплены")
 
 	// Рассчитать все параметры для каждого объекта
 	scrapResult := PaybackCalculation()
+	beego.Info("Параметры рассчитаны")
 
 	// Подготовить заголовки столбцов
 	titles := getTableTitles()
@@ -239,6 +242,8 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 func AdditionalObjectInfoCollect(webDriver selenium.WebDriver) {
 
 	for index, object := range allObjectsInfo {
+
+		beego.Info(fmt.Sprintf("Всего объектов: '%d', обрабатывается объект: '%d'", len(allObjectsInfo), index+1))
 
 		// Перейти на страницу объекта недвижимости
 		err := webDriver.Get(object.WebLink)
@@ -257,6 +262,12 @@ func AdditionalObjectInfoCollect(webDriver selenium.WebDriver) {
 			allObjectsInfo[index].GuaranteeAmount, _ = deposit.Text()
 		}
 
+		// Адрес
+		addressXpath := "//label[contains(text(),'Детальное местоположение имущества')]/../../td/span"
+		fullAddress, err := webDriver.FindElement(selenium.ByXPATH, addressXpath)
+		pageobjects.SeleniumError(err, "Не нашёлся адрес")
+		allObjectsInfo[index].Address, _ = fullAddress.Text()
+
 		//// На закладку "Общие"
 		tabXpath := "//span[text()='Общие']"
 		tabLink, err := webDriver.FindElement(selenium.ByXPATH, tabXpath)
@@ -264,12 +275,6 @@ func AdditionalObjectInfoCollect(webDriver selenium.WebDriver) {
 		err = tabLink.Click()
 		pageobjects.SeleniumError(err, "Не кликнулась закладка 'Общие'")
 		time.Sleep(3 * time.Second)
-
-		// Адрес
-		addressXpath := "//label[contains(text(),'Адрес')]/../../td/span"
-		fullAddress, err := webDriver.FindElement(selenium.ByXPATH, addressXpath)
-		pageobjects.SeleniumError(err, "Не нашёлся адрес")
-		allObjectsInfo[index].Address, _ = fullAddress.Text()
 
 		// Дата торгов
 		auctionDateXpath := "//label[contains(text(),'Дата и время проведения аукциона')]/../../td/span"
@@ -376,7 +381,7 @@ func PaybackCalculation() []models.ObjectScrapResult {
 				monthHeating + // Стоимость отопления в месяц
 				monthHousingOffice + // Обслуживание ЖЭКом в месяц
 				settings.AccountingService + // Бухгалтерское обслуживание в месяц
-				int((settings.ContractRegistration+settings.RunningCost)/objectInfo.RentalPeriod/12)
+				int((settings.ContractRegistration+settings.RunningCost)/objectInfo.RentalPeriod)
 		//beego.Info("Расходы в месяц:", monthPayout)
 
 		// Доход в год с учётом несдаваемых месяцев
@@ -454,8 +459,14 @@ func PaybackCalculation() []models.ObjectScrapResult {
 
 	}
 
-	// TODO:
+	// TODO: сделать switch для разных значений
 	// Отсортировать большой словарь по значению, указанному в конфиге
+	sort.SliceStable(scrapResult, func(i, j int) bool {
+		//if settings.SortFieldName == "Коэффициент доходности" {
+		//
+		//}
+		return scrapResult[i].ProfitMargin > scrapResult[j].ProfitMargin
+	})
 
 	// Проставить порядковый номер в первом столбце
 	scrapResult = SetObjectSerialNumber(scrapResult) // TODO: сделать с указателем
@@ -505,11 +516,6 @@ func ObjectInfoCollect(webDriver selenium.WebDriver) {
 
 /* Собрать иформацию об объектах на текущей странице в коллекцию */
 func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo {
-
-	//// Запомнить ссылку
-	//objectsListStartUrl, err := webDriver.CurrentURL()
-	//pageobjects.SeleniumError(err, "Не удалось получить текущий URL")
-	//beego.Info("Запомнили ссылку на страницу со списком объектов: ", objectsListStartUrl)
 
 	// Количество объектов на данной странице
 	realObjectXpath := "//div[@class='scrollx']/table//tr[contains(@class,'datarow')]"
@@ -577,10 +583,8 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 		if err != nil {
 			beego.Error("Ошибка преобразования сроков аренды объекта в строку: ", err)
 		}
-		objects[index].RentalPeriod, err = strconv.Atoi(strings.Replace(objectRentPeriodString, " лет", "", -1))
-		if err != nil {
-			beego.Error("Ошибка преобразования сроков аренды объекта из строки в int: ", err)
-		}
+
+		objects[index].RentalPeriod = GetRentalPeriodFromString(objectRentPeriodString)
 	}
 
 	// Ссылка для просмотра - должна быть последней при скрапинге, так как уходит с основной страницы с объектами
@@ -596,13 +600,30 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 		//beego.Debug("Ссылка на объект: ", objects[index].WebLink)
 	}
 
-	//// Вернуться на страницу со списком объектов
-	//beego.Info("Возврат на страницу со списком объектов: ", objectsListStartUrl)
-	//err = webDriver.Get(objectsListStartUrl)
-	//pageobjects.SeleniumError(err, "Не удалось вернуться на страницу со списком объектов")
-	//time.Sleep(3 * time.Second)
-
 	return objects
+}
+
+/* Возвращает период аренды в месяцах */
+func GetRentalPeriodFromString(rentPeriodString string) int {
+
+	var rentPeriod int
+	var err error
+
+	if strings.Contains(rentPeriodString, "лет") {
+		rentPeriod, err = strconv.Atoi(strings.Replace(rentPeriodString, " лет", "", -1))
+		rentPeriod = rentPeriod * 12 // В месяцы
+	} else if strings.Contains(rentPeriodString, "г.") {
+		rentPeriod, err = strconv.Atoi(strings.Replace(rentPeriodString, " г.", "", -1))
+		rentPeriod = rentPeriod * 12 // В месяцы
+	} else {
+		rentPeriod, err = strconv.Atoi(strings.Replace(rentPeriodString, " мес.", "", -1))
+	}
+
+	if err != nil {
+		beego.Error("Ошибка преобразования сроков аренды объекта из строки в int: ", err)
+	}
+
+	return rentPeriod
 }
 
 /* Искать */

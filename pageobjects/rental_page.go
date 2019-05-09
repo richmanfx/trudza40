@@ -212,7 +212,7 @@ func SetObjectAreaRange(webDriver selenium.WebDriver, settings *models.Settings)
 }
 
 /* Ввод значения в поле ввода */
-func inputValueInField(webDriver selenium.WebDriver, fieldXpath string, area uint, msg string) {
+func inputValueInField(webDriver selenium.WebDriver, fieldXpath string, area int, msg string) {
 	fieldElement, err := webDriver.FindElement(selenium.ByXPATH, fieldXpath)
 
 	SeleniumError(err, "Не нашлось "+msg)
@@ -259,17 +259,18 @@ func ObjectsWait(webDriver selenium.WebDriver) {
 	checkXpath := "//h2/span[contains(text(),'найдено лотов')]"
 	labelElement, err := webDriver.FindElement(selenium.ByXPATH, checkXpath)
 	SeleniumError(err, "Поиск не отработал, лоты не нашлись")
-	time.Sleep(5 * time.Second)
-	labelIsDisplayed, err := labelElement.IsDisplayed()
-	SeleniumError(err, "Ошибка при проверке отображения лотов")
 
-	if !labelIsDisplayed {
-		beego.Error("Лоты не отобразились")
-	} else {
-		beego.Debug("Лоты отобразились - удачный поиск")
-		//_, err = labelElement.LocationInView()		// Вроде бы так и не скролит
-		err = labelElement.MoveTo(0, 0)
-	}
+	//time.Sleep(5 * time.Second)
+	//labelIsDisplayed, err := labelElement.IsDisplayed()
+	//SeleniumError(err, "Ошибка при проверке отображения лотов")
+	//
+	//if !labelIsDisplayed {
+	//	beego.Error("Лоты не отобразились")
+	//} else {
+	beego.Debug("Лоты отобразились - удачный поиск")
+	//_, err = labelElement.LocationInView()		// Вроде бы так и не скролит
+	err = labelElement.MoveTo(0, 0)
+	//}
 
 }
 
