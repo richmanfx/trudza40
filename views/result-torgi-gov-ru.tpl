@@ -79,6 +79,7 @@
                 <td>{{ .MonthlyProfit }}</td>
                 <td>{{ .MonthlyCost }}</td>
                 <td>{{ .MonthlyRental }}</td>
+                <td>{{ .RentalPeriod }}</td>
                 <td>{{ .MonthlyHeating }}</td>
                 <td>{{ .HousingOfficeMaintenance }}</td>
                 <td>{{ .YearProfit }}</td>

@@ -18,6 +18,7 @@ type ObjectScrapResult struct {
 	LossFreeRental           int     // Безубыточная сдача, руб/кв.м. в месяц
 	YearRental               int     // Выплаты ренты в год
 	MonthlyRental            int     // Выплаты ренты в месяц
+	RentalPeriod             int     // Срок аренды, месяцев
 	YearInsurance            int     // Страховка за год
 	MonthlyCost              int     // Расходы в месяц
 	MonthlyHeating           int     // Стоимость отопления в месяц

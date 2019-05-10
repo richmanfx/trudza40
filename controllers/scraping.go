@@ -315,6 +315,7 @@ func getTableTitles() []string {
 	titles = append(titles, "Доход в месяц, рублей")
 	titles = append(titles, "Расходы в месяц, рублей")
 	titles = append(titles, "Выплата ренты в месяц, рублей")
+	titles = append(titles, "Срок аренды, месяцев")
 	titles = append(titles, "Стоимость отопления в месяц, рублей")
 	titles = append(titles, "Обслуживание ЖЭКом в месяц, рублей")
 
@@ -426,6 +427,9 @@ func PaybackCalculation() []models.ObjectScrapResult {
 
 		// Безубыточная сдача
 		oneObjectScrapResult.LossFreeRental = lossFreeRent
+
+		// Срок аренды
+		oneObjectScrapResult.RentalPeriod = objectInfo.RentalPeriod
 
 		// Выплаты ренты в год
 		oneObjectScrapResult.YearRental = objectInfo.MonthlyRental * 12
@@ -573,7 +577,6 @@ func onePageObjectInfoCollect(webDriver selenium.WebDriver) []models.ObjectInfo 
 	}
 
 	// Срок аренды
-	// TODO: На странице и "лет", и "мес"???
 	rentPeriodsXpath := realObjectXpath + "/td[6]/span/span[2]"
 	objectsRentPeriods, err := webDriver.FindElements(selenium.ByXPATH, rentPeriodsXpath)
 	pageobjects.SeleniumError(err, "Не нашлись сроки аренды объектов")
