@@ -64,3 +64,12 @@ input[type="checkbox"]:checked + label:before {
     -webkit-transform: rotate(45deg);
     transform: rotate(45deg);
 }
+
+div.user-label {
+    margin: 0.5em 2em 0;
+}
+
+span.user-label {
+    color: #327122;
+    font-weight: bold;
+}

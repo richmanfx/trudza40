@@ -19,4 +19,5 @@ func (controller *MainController) Realty() {
 	//CheckSession(controller)
 	controller.TplName = "realty.tpl"
 	controller.Data["title"] = "Realty"
+	controller.Data["GlobalUserLogin"] = GlobalUserLogin
 }

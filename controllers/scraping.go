@@ -28,6 +28,7 @@ var allObjectsInfo []models.ObjectInfo
 func (controller *ScrapController) TorgiGovRuSettings() {
 	controller.TplName = "settings-torgi-gov-ru.tpl"
 	controller.Data["title"] = "Settings"
+	controller.Data["GlobalUserLogin"] = GlobalUserLogin
 
 	// Получить значения настроек из БД для залогиненного пользователя
 	if GlobalUserId == 0 {

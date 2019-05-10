@@ -9,7 +9,7 @@ import (
 
 var GlobalUserId = 0
 
-//var GlobalUserLogin string
+var GlobalUserLogin string
 
 type AuthController struct {
 	beego.Controller
@@ -38,7 +38,7 @@ func (controller *AuthController) LoginProcessing() {
 		beego.Info(fmt.Sprintf("Пользователь '%s' вошёл в приложение.", userName))
 
 		// Логин пользователя для заголовка
-		//GlobalUserLogin = userName // TODO: Пока заголовок не реализован
+		GlobalUserLogin = userName // TODO: Пока заголовок не реализован
 
 		////// Добавить куку с ID пользователя
 		//userSession, _ = globalSessions.SessionStart(w, r)
