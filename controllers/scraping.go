@@ -30,6 +30,8 @@ func (controller *ScrapController) TorgiGovRuSettings() {
 	controller.Data["title"] = "Settings"
 	controller.Data["GlobalUserLogin"] = GlobalUserLogin
 
+	CheckSession((*MainController)(controller))
+
 	// Получить значения настроек из БД для залогиненного пользователя
 	if GlobalUserId == 0 {
 		beego.Error("Пользователь не авторизован, UserId = 0")
@@ -182,60 +184,67 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 
 	// Удалённый ВебДрайвер
 	webDriver, err = selenium.NewRemote(capabilities, fmt.Sprintf("http://localhost:%d/wd/hub", remoteDriverPort))
-	if err != nil {
-		beego.Error("Не смогли получить удалённый WebDriver")
-		// TODO: Вывести сообщение об ошибке в браузер
-		panic(err)
-	}
-	defer func() {
-		if err := webDriver.Quit(); err != nil {
-			beego.Error("Не смогли выйти из инстанса браузера (закрыть WebDriver)")
+	if err == nil {
+		defer func() {
+			if err := webDriver.Quit(); err != nil {
+				beego.Error("Не смогли выйти из инстанса браузера (закрыть WebDriver)")
+			}
+		}()
+
+		// Выставить размеры окна браузера
+		err = webDriver.ResizeWindow("", int(settings.BrowserWidth), int(settings.BrowserHeight))
+		if err != nil {
+			beego.Error("Браузер не смог выставить размер окна")
 		}
-	}()
 
-	// Выставить размеры окна браузера
-	err = webDriver.ResizeWindow("", int(settings.BrowserWidth), int(settings.BrowserHeight))
-	if err != nil {
-		beego.Error("Браузер не смог выставить размер окна")
+		// Открыть страницу
+		err = webDriver.Get(settings.HostPageUrl)
+		if err != nil {
+			beego.Error("Не открылся сайт")
+			panic(err)
+		}
+
+		// Выставить фильтры поиска
+		SetSearchFilters(webDriver)
+
+		// Искать
+		ObjectsSearch(webDriver)
+
+		// Определить количество найденных объектов
+		quantity := pageobjects.GetObjectsQuantity(webDriver)
+		//beego.Info(fmt.Sprintf("Количество найденных объектов: %v", quantity))
+
+		// Слайс для информации обо всех объектах со всех страниц
+		allObjectsInfo = make([]models.ObjectInfo, 0, quantity)
+
+		// Собрать информацию по объектам на всех страницах
+		ObjectInfoCollect(webDriver)
+		//beego.Debug(fmt.Sprintf("Информация об объектах на всех страницах: %v", allObjectsInfo))
+
+		// Собрать дополнительную информацию по каждому объекту
+		AdditionalObjectInfoCollect(webDriver)
+		beego.Info("Дополнительные параметры соскраплены")
+
+		// Рассчитать все параметры для каждого объекта
+		scrapResult := PaybackCalculation()
+		beego.Info("Параметры рассчитаны")
+
+		// Подготовить заголовки столбцов
+		titles := getTableTitles()
+
+		// Вывести результаты расчётов
+		controller.HtmlReportCreate(titles, scrapResult)
+
+	} else {
+		message := fmt.Sprintf("Не смогли получить удалённый WebDriver: '%v'", err)
+		beego.Error(message)
+
+		// Вывод сообщения об ошибке в модальном окне
+		controller.TplName = "message-modal.tpl"
+		controller.Data["title"] = "Ошибка"
+		controller.Data["message1"] = "Ошибка"
+		controller.Data["message2"] = message
 	}
-
-	// Открыть страницу
-	err = webDriver.Get(settings.HostPageUrl)
-	if err != nil {
-		beego.Error("Не открылся сайт")
-		panic(err)
-	}
-
-	// Выставить фильтры поиска
-	SetSearchFilters(webDriver)
-
-	// Искать
-	ObjectsSearch(webDriver)
-
-	// Определить количество найденных объектов
-	quantity := pageobjects.GetObjectsQuantity(webDriver)
-	//beego.Info(fmt.Sprintf("Количество найденных объектов: %v", quantity))
-
-	// Слайс для информации обо всех объектах со всех страниц
-	allObjectsInfo = make([]models.ObjectInfo, 0, quantity)
-
-	// Собрать информацию по объектам на всех страницах
-	ObjectInfoCollect(webDriver)
-	//beego.Debug(fmt.Sprintf("Информация об объектах на всех страницах: %v", allObjectsInfo))
-
-	// Собрать дополнительную информацию по каждому объекту
-	AdditionalObjectInfoCollect(webDriver)
-	beego.Info("Дополнительные параметры соскраплены")
-
-	// Рассчитать все параметры для каждого объекта
-	scrapResult := PaybackCalculation()
-	beego.Info("Параметры рассчитаны")
-
-	// Подготовить заголовки столбцов
-	titles := getTableTitles()
-
-	// Вывести результаты расчётов
-	controller.HtmlReportCreate(titles, scrapResult)
 
 }
 

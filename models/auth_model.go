@@ -28,7 +28,7 @@ func init() {
 
 	baseName, baseUserName, baseUserPassword := getDbAccount()
 
-	// Регистрация ВЕХ моделей !!!
+	// Регистрация ВСЕХ моделей !!!
 	orm.RegisterModel(new(User), new(Settings))
 
 	// Регистрация драйвера БД
@@ -51,7 +51,13 @@ func init() {
 	}
 }
 
-/* Проверить наличие пользователя в БД */
+/** Проверить наличие пользователя в БД
+ *
+ * Param: login - Имя пользователя
+ *
+ * Return: user.Id - Идентификатор пользователя
+ *         err     - Ошибка
+ */
 func CheckUserInDB(login string) (int, error) {
 
 	var err error
@@ -144,12 +150,12 @@ func CheckPasswordInDB(login, password string) error {
 		if err == nil {
 			beego.Info("Хеш пароля совпадает с Хешем из БД")
 		} else {
-			beego.Info("Хеш пароля не совпадает с Хешем из БД")
+			beego.Error("!!! Хеш пароля не совпадает с Хешем из БД !!!")
 			err = errors.New(fmt.Sprintln("Неверный логин/пароль"))
 		}
 	}
 	if err != nil {
-		beego.Info(fmt.Sprintf("Ошибка при проверке пароля по Хешу из БД: '%v'", err))
+		beego.Error(fmt.Sprintf("Ошибка при проверке пароля по Хешу из БД: '%v'", err))
 	}
 	return err
 }
@@ -171,13 +177,11 @@ func GetSaltFromDb(userLogin string) (string, error) {
 		fmt.Printf("Not row found") // No result
 	}
 
-	salt := user.Salt
-
 	//defer db.Close()		// TODO: Пока не знаю закрывать ли...
 	if err != nil {
 		beego.Info(fmt.Sprintf("Ошибка получения 'соли' для пользователя с логином '%s': %v", userLogin, err))
 	}
-	return salt, err
+	return user.Salt, err
 }
 
 /* Получить Хеш пароля с заданной солью */

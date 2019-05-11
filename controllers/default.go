@@ -16,7 +16,7 @@ func (controller *MainController) Get() {
 }
 
 func (controller *MainController) Realty() {
-	//CheckSession(controller)
+	CheckSession(controller)
 	controller.TplName = "realty.tpl"
 	controller.Data["title"] = "Realty"
 	controller.Data["GlobalUserLogin"] = GlobalUserLogin
