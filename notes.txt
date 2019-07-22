@@ -15,3 +15,11 @@ sed 's/base64,.*"/base64,\n"/' index.tpl.old | sed '7r favicon.b64' > index.tpl
 go get github.com/beego/bee
 go install github.com/beego/bee
 
+
+Про неработу beego.Error:
+https://github.com/astaxie/beego/issues/3588
+Помогает пока:
+temporary solution:
+cd $GOPATH/src/github.com/astaxie/beego
+git checkout 422e828
+

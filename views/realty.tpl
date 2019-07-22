@@ -11,12 +11,12 @@
                     <td> 1 </td>
                     <td><strong> torgi.gov.ru </strong></td>
                     <td>
-                        <a class="button" title="Параметры для скрапинга" href="/realty/settings_torgi_gov_ru">
+                        <a class="button is-success" title="Параметры для скрапинга" href="/realty/settings_torgi_gov_ru">
                             Параметры
                         </a>
                     </td>
                     <td>
-                        <a class="button" title="Скрапинг 'torgi.gov.ru'" href="/realty/scraping_torgi_gov_ru">
+                        <a class="button is-success" title="Скрапинг 'torgi.gov.ru'" href="/realty/scraping_torgi_gov_ru">
                             Скрапинг
                         </a>
                     </td>

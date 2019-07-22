@@ -38,13 +38,11 @@
 
         <div class="navbar-end">
             <div class="navbar-item">
+                <div class="user-label">
+                    Пользователь: <span class="user-label">{{ .GlobalUserLogin }}</span>
+                </div>
                 <div class="buttons">
-
-                    <a class="navbar-item" title="Выход" href="/realty/logout">
-                        Выход
-                    </a>
-
-
+                    <a class="navbar-item" title="Выход" href="/realty/logout"> Выход </a>
                 </div>
             </div>
         </div>

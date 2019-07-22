@@ -9,16 +9,20 @@
             <div class="field">
                 <label class="label is-medium">Логин:</label>
                 <div class="control">
-                    <input class="input is-medium is-primary" name="user_name"
-                           placeholder=" Имя пользователя" required>
+                    <label>
+                        <input class="input is-medium is-primary" name="user_name"
+                               placeholder=" Имя пользователя" required>
+                    </label>
                 </div>
             </div>
 
             <div class="field">
                 <label class="label is-medium">Пароль: </label>
                 <div class="control">
-                    <input class="input is-medium is-primary" name="user_password"
-                           placeholder=" Пароль" type="password" required>
+                    <label>
+                        <input class="input is-medium is-primary" name="user_password"
+                               placeholder=" Пароль" type="password" required>
+                    </label>
                 </div>
             </div>
 

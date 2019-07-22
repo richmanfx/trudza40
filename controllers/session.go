@@ -3,46 +3,56 @@ package controllers
 import (
 	"fmt"
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/session"
+	"github.com/gorilla/sessions"
 	"net/http"
 )
 
-var globalSessions *session.Manager
-var userSession session.Store
+//var globalSessions *session.Manager
+//var userSession session.Store
+
+// Инициализация хранилища сессий секретным ключом
+var store = sessions.NewCookieStore([]byte("Здесь-секретный-ключ_вынести_его"))
 
 /* Инициализировать механизм сессий */
 func SessionInit() {
 
-	var (
-		err                   error
-		providerName          = "memory" // Сессии будем хранить в памяти, не в базе
-		sessionProviderConfig session.ManagerConfig
-	)
+	//var (
+	//	err                   error
+	//	providerName          = "memory" // Сессии будем хранить в памяти, не в базе
+	//	sessionProviderConfig session.ManagerConfig
+	//)
+	//
+	////sessionProviderConfig.CookieName = "begoosessionID"
+	//sessionProviderConfig.Gclifetime = 3600
+	//
+	//// Инициализировать данные
+	//globalSessions, err = session.NewManager(providerName, &sessionProviderConfig)
+	//if err != nil {
+	//	beego.Error("Error create session manager")
+	//}
+	//
+	//// Почистить старые сессии
+	//go globalSessions.GC()
 
-	//sessionProviderConfig.CookieName = "begoosessionID"
-	sessionProviderConfig.Gclifetime = 3600
-
-	globalSessions, err = session.NewManager(providerName, &sessionProviderConfig)
-	if err != nil {
-		beego.Error("Error create session manager")
-	}
-
-	go globalSessions.GC() // Почистить старые сессии
 }
 
 /* Приверить наличие сессии */
 func CheckSession(controller *MainController) {
 
-	userSession = controller.StartSession()
-	userID := userSession.Get("UserID")
-	sid := userSession.SessionID()
+	session, err := store.Get(controller.Ctx.Request, "session-name")
+	if err != nil {
+		http.Error(controller.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	beego.Info(fmt.Sprintf("В функции 'CheckSession' sid='%v' и userId='%v'", sid, userID))
-
-	if userID == nil {
+	if session.ID == "" {
 		// Пользователь ранее не логинился
-		beego.Debug("Пользователь ранее не логинился")
+		beego.Info("Пользователь ранее не логинился")
+
+		//controller.TplName = "/realty/login"
 		controller.Redirect("/realty/login", http.StatusSeeOther)
 	}
+
+	beego.Info(fmt.Sprintf("В функции 'CheckSession' sid='%v'", session.ID))
 
 }

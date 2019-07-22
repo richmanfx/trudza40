@@ -27,6 +27,7 @@ func (controller *ConfigController) UsersConfig() {
 	if err == nil {
 		controller.TplName = "users-config.tpl"
 		controller.Data["title"] = "Users Config"
+		controller.Data["GlobalUserLogin"] = GlobalUserLogin
 		controller.Data["users"] = users
 	} else {
 		beego.Error("Ошибка при получении данных о пользователях из БД")
