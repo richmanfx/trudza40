@@ -12,9 +12,9 @@ import (
 /* Войти в расширенный поиск */
 func ComeInExtSearch(webDriver selenium.WebDriver) {
 
-	// Закрыть алерт
-	err := webDriver.AcceptAlert()
-	seleniumError(err, "Не закрылся Аллерт")
+	//// Закрыть алерт
+	//err := webDriver.AcceptAlert()
+	//seleniumError(err, "Не закрылся Аллерт")
 
 	extSearchButtonXpath := "//ins[@id='ext_search']"
 	btn, err := webDriver.FindElement(selenium.ByXPATH, extSearchButtonXpath)
