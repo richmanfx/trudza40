@@ -282,6 +282,7 @@ func GetObjectsQuantity(webDriver selenium.WebDriver) int {
 	SeleniumError(err, "Количество лотов не нашлось")
 	labelText, err := labelElement.Text()
 	splitLabelText := strings.Split(labelText, " ")
+	//beego.Debug("Текст лейбла: ", splitLabelText)
 	objectsQuantity, _ := strconv.Atoi(splitLabelText[len(splitLabelText)-1])
 
 	return objectsQuantity

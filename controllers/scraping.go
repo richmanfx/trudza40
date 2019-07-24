@@ -176,11 +176,16 @@ func (controller *ScrapController) TorgiGovRuScraping() {
 
 	var webDriver selenium.WebDriver
 	var capabilities = make(selenium.Capabilities, 1)
-	var browser = "chrome"
+	//var browser = "chrome"
 	var remoteDriverPort = 4444
 	var err error
 
-	capabilities["browserName"] = browser
+	//capabilities["browserName"] = browser
+	capabilities = selenium.Capabilities{
+		"browserName": "chrome",
+		"version":     "",
+		"enableVNC":   true,
+		"enableVideo": false}
 
 	// Удалённый ВебДрайвер
 	webDriver, err = selenium.NewRemote(capabilities, fmt.Sprintf("http://localhost:%d/wd/hub", remoteDriverPort))
